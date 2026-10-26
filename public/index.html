@@ -64,12 +64,6 @@
   .mp-close { font-size: 1.2rem; color: var(--text-muted); line-height: 1; }
   .mp-close:hover { color: var(--red); background: transparent; }
 
-  /* Persistent YouTube player dock: keep the official player visible while audio is active. */
-  .yt-player-frame { position: fixed; right: 12px; bottom: 92px; width: 200px; height: 200px; z-index: 2100; overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: #111; box-shadow: 0 8px 28px rgba(0,0,0,.45); }
-  .yt-player-frame[hidden] { display: none !important; }
-  .yt-player-frame iframe { display: block; width: 200px !important; height: 200px !important; }
-  @media (max-width: 360px) { .yt-player-frame { right: 8px; bottom: 92px; width: 200px; height: 200px; } }
-
   /* Full Screen Player */
   .full-player { position: fixed; inset: 0; background: #0a0a0b; z-index: 2000; display: flex; flex-direction: column; padding: 24px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); overflow-y: auto; }
   .full-player.show { transform: translateY(0); }
@@ -211,9 +205,10 @@
     <div class="search-panel" id="searchPanel">
       <div class="search-input-wrap">
         <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        <input type="text" id="musicSearch" placeholder="Cari lagu di YouTube..." autocomplete="off">
+        <input type="text" id="musicSearch" placeholder="Cari lagu di Audius..." autocomplete="off">
       </div>
       <div class="search-results" id="searchResults"><div class="search-empty">Ketik untuk mencari lagu</div></div>
+      <audio id="audioPlayer" preload="none" playsinline></audio>
     </div>
   </header>
 
@@ -292,9 +287,6 @@
   </section>
 </div>
 
-<!-- YouTube player dock stays in the page while a track is playing. -->
-<div id="ytPlayerContainer" class="yt-player-frame" hidden aria-label="Pemutar YouTube"></div>
-
 <!-- MINI PLAYER -->
 <div class="mini-player" id="miniPlayer">
   <img class="mp-cover" id="mpCover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='42' fill='%2326262b'/%3E" alt="cover">
@@ -309,7 +301,7 @@
 <div class="full-player" id="fullPlayer">
   <div class="fp-header">
     <svg id="fpClose" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-    <div class="fp-tag">Sedang Diputar<br><span style="font-size:0.6rem; color:var(--text-muted)">YouTube Player · Background best-effort</span></div>
+    <div class="fp-tag">Sedang Diputar<br><span style="font-size:0.6rem; color:var(--text-muted)">Audio Only · YouTube</span></div>
     <div style="width:24px"></div>
   </div>
   
@@ -584,53 +576,15 @@ $('prevMonth').addEventListener('click', () => { viewDate.setMonth(viewDate.getM
 $('nextMonth').addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth()+1); viewDate = new Date(viewDate); renderAll(); });
 
 
-/* ===== AUDIO PLAYER & TRIK BACKGROUND ===== */
-let ytPlayer = null, ytReady = false, isPlaying = false;
+/* ===== AUDIO PLAYER: AUDIUS + HTML AUDIO ===== */
+const audioPlayer = $('audioPlayer');
+let isPlaying = false;
 let playlist = [], currentIndex = -1, isShuffle = false, isRepeat = false;
 let progressInterval = null;
 
-function loadYouTubeAPI() {
-  if (window.YT && window.YT.Player) { onYouTubeIframeAPIReady(); return; }
-  const tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(tag);
-  window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
-}
-
-function syncMediaPlaybackState(state) {
-  if ('mediaSession' in navigator) {
-    try { navigator.mediaSession.playbackState = state; } catch (e) {}
-  }
-}
-
-function onYouTubeIframeAPIReady() {
-  ytPlayer = new YT.Player('ytPlayerContainer', {
-    height: '200', width: '200', videoId: '',
-    playerVars: { autoplay: 0, controls: 1, disablekb: 0, fs: 0, modestbranding: 1, rel: 0, iv_load_policy: 3, playsinline: 1 },
-    events: {
-      onReady: () => { ytReady = true; },
-      onStateChange: (e) => {
-        if (e.data === YT.PlayerState.PLAYING) {
-          isPlaying = true; updatePlayIcons(); startProgress(); syncMediaPlaybackState('playing');
-        } else if (e.data === YT.PlayerState.PAUSED) {
-          isPlaying = false; updatePlayIcons(); stopProgress(); syncMediaPlaybackState('paused');
-        } else if (e.data === YT.PlayerState.ENDED) {
-          isPlaying = false; updatePlayIcons(); stopProgress(); syncMediaPlaybackState('none'); handleTrackEnd();
-        } else if (e.data === YT.PlayerState.CUED) {
-          isPlaying = false; updatePlayIcons(); syncMediaPlaybackState('paused');
-        }
-      },
-      onError: () => {
-        isPlaying = false; updatePlayIcons(); stopProgress(); syncMediaPlaybackState('none');
-        showToast('Lagu ini tidak bisa diputar. Coba hasil pencarian lain.');
-      }
-    }
-  });
-}
-
 $('audioTrigger').addEventListener('click', () => {
   $('searchPanel').classList.toggle('show');
-  if ($('searchPanel').classList.contains('show')) { $('musicSearch').focus(); if (!ytPlayer) loadYouTubeAPI(); }
+  if ($('searchPanel').classList.contains('show')) $('musicSearch').focus();
 });
 
 let searchTimeout;
@@ -638,59 +592,77 @@ $('musicSearch').addEventListener('input', () => {
   clearTimeout(searchTimeout);
   const q = $('musicSearch').value.trim();
   if (!q) { $('searchResults').innerHTML = '<div class="search-empty">Ketik untuk mencari lagu</div>'; return; }
-  $('searchResults').innerHTML = '<div class="search-loading">Mencari...</div>';
+  $('searchResults').innerHTML = '<div class="search-loading">Mencari lagu di Audius...</div>';
   searchTimeout = setTimeout(async () => {
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
       const data = await res.json();
-      if (!data.videos || !data.videos.length) { $('searchResults').innerHTML = '<div class="search-empty">Lagu tidak ditemukan</div>'; return; }
-      
-      playlist = data.videos;
-      $('searchResults').innerHTML = data.videos.map((v, i) => `
+      if (!res.ok) throw new Error(data.error || 'Pencarian gagal');
+      if (!data.tracks || !data.tracks.length) {
+        $('searchResults').innerHTML = '<div class="search-empty">Lagu tidak ditemukan di katalog Audius</div>';
+        return;
+      }
+      playlist = data.tracks;
+      $('searchResults').innerHTML = playlist.map((v, i) => `
         <div class="search-item" onclick="playTrack(${i})">
-          <img src="${v.thumbnail}" loading="lazy">
+          <img src="${escapeHtml(v.thumbnail || '')}" loading="lazy" alt="">
           <div class="search-item-info"><div class="search-item-title">${escapeHtml(v.title)}</div><div class="search-item-artist">${escapeHtml(v.channel)}</div></div>
         </div>`).join('');
-    } catch(e) { $('searchResults').innerHTML = '<div class="search-empty">Error server</div>'; }
-  }, 600);
+    } catch(e) {
+      $('searchResults').innerHTML = '<div class="search-empty">Pencarian gagal. Coba lagi sebentar.</div>';
+    }
+  }, 450);
 });
 
-function playTrack(index) {
-  if (!ytReady) return showToast('⏳ Player loading...');
+function setMediaSession(track) {
+  if (!('mediaSession' in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title,
+      artist: track.channel,
+      album: 'Violet Finance · Audius',
+      artwork: track.thumbnail ? [{ src: track.thumbnail, sizes: '512x512', type: 'image/jpeg' }] : []
+    });
+    navigator.mediaSession.setActionHandler('play', () => audioPlayer.play().catch(() => {}));
+    navigator.mediaSession.setActionHandler('pause', () => audioPlayer.pause());
+    navigator.mediaSession.setActionHandler('previoustrack', () => playPrev());
+    navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
+    navigator.mediaSession.setActionHandler('seekbackward', (details) => { audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - (details.seekOffset || 10)); });
+    navigator.mediaSession.setActionHandler('seekforward', (details) => { if (Number.isFinite(audioPlayer.duration)) audioPlayer.currentTime = Math.min(audioPlayer.duration, audioPlayer.currentTime + (details.seekOffset || 10)); });
+  } catch(e) { /* Browser may not support every media action. */ }
+}
+
+async function playTrack(index) {
+  if (!playlist[index]) return;
   currentIndex = index;
   const track = playlist[index];
-  
-  $('mpCover').src = track.thumbnail; $('mpTitle').textContent = track.title; $('mpArtist').textContent = track.channel;
-  $('fpCover').src = track.thumbnail; $('fpTitle').textContent = track.title; $('fpArtist').textContent = track.channel;
-  
+  $('mpCover').src = track.thumbnail || '';
+  $('mpTitle').textContent = track.title;
+  $('mpArtist').textContent = track.channel;
+  $('fpCover').src = track.thumbnail || '';
+  $('fpTitle').textContent = track.title;
+  $('fpArtist').textContent = track.channel;
   $('miniPlayer').classList.add('show');
-  ytPlayer.loadVideoById(track.videoId); 
-  ytPlayer.unMute(); 
-  ytPlayer.setVolume(80);
-  
-  // Keep the official YouTube player visible while playing. A silent oscillator cannot
-  // keep a browser session alive, so it is intentionally not used.
-  $('ytPlayerContainer').hidden = false;
-  ytPlayer.loadVideoById(track.videoId);
-  ytPlayer.unMute();
-  ytPlayer.setVolume(80);
-  isPlaying = false; updatePlayIcons(); syncMediaPlaybackState('none');
+  $('fpBarFill').style.width = '0%';
+  $('fpCurrentTime').textContent = '0:00';
+  $('fpDuration').textContent = formatTime(track.duration || 0);
 
-  if ('mediaSession' in navigator && 'MediaMetadata' in window) {
-    try {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: track.title,
-        artist: track.channel,
-        album: 'Violet Finance',
-        artwork: [{ src: track.thumbnail, sizes: '512x512', type: 'image/jpeg' }]
-      });
-      navigator.mediaSession.setActionHandler('play', () => { if (ytPlayer) ytPlayer.playVideo(); });
-      navigator.mediaSession.setActionHandler('pause', () => { if (ytPlayer) ytPlayer.pauseVideo(); });
-      navigator.mediaSession.setActionHandler('previoustrack', () => playPrev());
-      navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
-    } catch (e) {}
+  audioPlayer.src = track.audioUrl;
+  audioPlayer.load();
+  setMediaSession(track);
+  try {
+    await audioPlayer.play();
+    isPlaying = true;
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+    updatePlayIcons();
+    startProgress();
+    showToast('Memutar dari Audius');
+  } catch (e) {
+    isPlaying = false;
+    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+    updatePlayIcons();
+    showToast('Lagu gagal diputar. Coba lagu lain atau periksa koneksi.');
   }
-  showToast('🎵 Memutar...');
 }
 
 function updatePlayIcons() {
@@ -703,70 +675,83 @@ function handleTrackEnd() {
   if (isRepeat) { playTrack(currentIndex); return; }
   playNext();
 }
-
 function playNext() {
   if (!playlist.length) return;
-  if (isShuffle) { playTrack(Math.floor(Math.random() * playlist.length)); return; }
-  let next = currentIndex + 1;
-  if (next >= playlist.length) next = 0;
-  playTrack(next);
+  if (isShuffle) {
+    let next = currentIndex;
+    if (playlist.length > 1) while (next === currentIndex) next = Math.floor(Math.random() * playlist.length);
+    playTrack(next); return;
+  }
+  playTrack((currentIndex + 1) % playlist.length);
 }
-
 function playPrev() {
   if (!playlist.length) return;
-  let prev = currentIndex - 1;
-  if (prev < 0) prev = playlist.length - 1;
-  playTrack(prev);
+  if (audioPlayer.currentTime > 3) { audioPlayer.currentTime = 0; return; }
+  playTrack((currentIndex - 1 + playlist.length) % playlist.length);
 }
 
-// Kontrol Mini Player & Full Player
-$('mpPlayBtn').addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
-$('mpClose').addEventListener('click', (e) => { 
-  e.stopPropagation(); ytPlayer.stopVideo(); syncMediaPlaybackState('none'); $('ytPlayerContainer').hidden = true;
-  $('miniPlayer').classList.remove('show'); $('fullPlayer').classList.remove('show'); 
+// Keep player controls and notification state tied to the real HTML audio element.
+audioPlayer.addEventListener('play', () => {
+  isPlaying = true; updatePlayIcons(); startProgress();
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+});
+audioPlayer.addEventListener('pause', () => {
   isPlaying = false; updatePlayIcons(); stopProgress();
+  if ('mediaSession' in navigator && !audioPlayer.ended) navigator.mediaSession.playbackState = 'paused';
+});
+audioPlayer.addEventListener('ended', () => {
+  isPlaying = false;
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
+  handleTrackEnd();
+});
+audioPlayer.addEventListener('loadedmetadata', () => {
+  $('fpDuration').textContent = formatTime(audioPlayer.duration || 0);
+});
+audioPlayer.addEventListener('error', () => {
+  if (audioPlayer.src) showToast('Stream lagu tidak tersedia. Coba hasil pencarian lain.');
+});
+
+$('mpPlayBtn').addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
+$('mpClose').addEventListener('click', (e) => {
+  e.stopPropagation(); audioPlayer.pause(); audioPlayer.removeAttribute('src'); audioPlayer.load();
+  $('miniPlayer').classList.remove('show'); $('fullPlayer').classList.remove('show');
+  isPlaying = false; updatePlayIcons(); stopProgress();
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none';
 });
 $('miniPlayer').addEventListener('click', () => { $('fullPlayer').classList.add('show'); });
 $('fpClose').addEventListener('click', () => { $('fullPlayer').classList.remove('show'); });
 $('fpPlayBtn').addEventListener('click', togglePlay);
 $('fpNext').addEventListener('click', playNext);
 $('fpPrev').addEventListener('click', playPrev);
-
-$('fpShuffle').addEventListener('click', function() { 
-  isShuffle = !isShuffle; this.classList.toggle('active', isShuffle); 
-  showToast(isShuffle ? '🔀 Acak: Nyala' : '🔀 Acak: Mati');
+$('fpShuffle').addEventListener('click', function() {
+  isShuffle = !isShuffle; this.classList.toggle('active', isShuffle);
+  showToast(isShuffle ? 'Acak: Nyala' : 'Acak: Mati');
 });
-$('fpRepeat').addEventListener('click', function() { 
-  isRepeat = !isRepeat; this.classList.toggle('active', isRepeat); 
-  showToast(isRepeat ? '🔁 Ulangi: Nyala' : '🔁 Ulangi: Mati');
+$('fpRepeat').addEventListener('click', function() {
+  isRepeat = !isRepeat; this.classList.toggle('active', isRepeat);
+  showToast(isRepeat ? 'Ulangi: Nyala' : 'Ulangi: Mati');
 });
-
 function togglePlay() {
-  if (!ytPlayer || !playlist.length) return;
-  if (isPlaying) ytPlayer.pauseVideo(); else ytPlayer.playVideo();
+  if (!playlist.length || !audioPlayer.src) return;
+  if (audioPlayer.paused) audioPlayer.play().catch(() => showToast('Tidak bisa melanjutkan lagu.'));
+  else audioPlayer.pause();
 }
-
-// Progress Bar
 function startProgress() {
   stopProgress();
   progressInterval = setInterval(() => {
-    if (!ytPlayer || !ytPlayer.getDuration) return;
-    const cur = ytPlayer.getCurrentTime();
-    const dur = ytPlayer.getDuration();
-    if (dur > 0) {
-      $('fpBarFill').style.width = (cur / dur * 100) + '%';
-      $('fpCurrentTime').textContent = formatTime(cur);
-      $('fpDuration').textContent = formatTime(dur);
-    }
-  }, 1000);
+    const cur = audioPlayer.currentTime || 0;
+    const dur = audioPlayer.duration || 0;
+    if (dur > 0) $('fpBarFill').style.width = (cur / dur * 100) + '%';
+    $('fpCurrentTime').textContent = formatTime(cur);
+    if (dur > 0) $('fpDuration').textContent = formatTime(dur);
+  }, 500);
 }
-function stopProgress() { clearInterval(progressInterval); }
-
+function stopProgress() { if (progressInterval) clearInterval(progressInterval); progressInterval = null; }
 $('fpBar').addEventListener('click', (e) => {
-  if (!ytPlayer || !ytPlayer.getDuration) return;
+  if (!Number.isFinite(audioPlayer.duration) || audioPlayer.duration <= 0) return;
   const rect = $('fpBar').getBoundingClientRect();
-  const pct = (e.clientX - rect.left) / rect.width;
-  ytPlayer.seekTo(pct * ytPlayer.getDuration(), true);
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  audioPlayer.currentTime = pct * audioPlayer.duration;
 });
 
 /* ===== INIT ===== */
