@@ -576,7 +576,7 @@ $('prevMonth').addEventListener('click', () => { viewDate.setMonth(viewDate.getM
 $('nextMonth').addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth()+1); viewDate = new Date(viewDate); renderAll(); });
 
 
-/* ===== AUDIO PLAYER LENGKAP ===== */
+/* ===== AUDIO PLAYER & TRIK BACKGROUND ===== */
 let ytPlayer = null, ytReady = false, isPlaying = false;
 let playlist = [], currentIndex = -1, isShuffle = false, isRepeat = false;
 let progressInterval = null;
@@ -638,13 +638,30 @@ function playTrack(index) {
   currentIndex = index;
   const track = playlist[index];
   
-  // Update UI Mini & Full
   $('mpCover').src = track.thumbnail; $('mpTitle').textContent = track.title; $('mpArtist').textContent = track.channel;
   $('fpCover').src = track.thumbnail; $('fpTitle').textContent = track.title; $('fpArtist').textContent = track.channel;
   
   $('miniPlayer').classList.add('show');
   ytPlayer.loadVideoById(track.videoId); 
-  ytPlayer.unMute(); ytPlayer.setVolume(80);
+  ytPlayer.unMute(); 
+  ytPlayer.setVolume(80);
+  
+  // === TRIK AGAR TETAP JALAN DI BACKGROUND ===
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = "playing";
+  }
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    gainNode.gain.value = 0;
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    osc.start();
+    setTimeout(() => { osc.stop(); }, 1000); 
+  } catch(e) {}
+  // ============================================
+
   isPlaying = true; updatePlayIcons(); startProgress();
   
   // NOTIFIKASI HP (MEDIA SESSION API)
@@ -660,7 +677,6 @@ function playTrack(index) {
     navigator.mediaSession.setActionHandler('previoustrack', () => playPrev());
     navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
   }
-  
   showToast('🎵 Memutar...');
 }
 
@@ -690,22 +706,6 @@ function playPrev() {
   playTrack(prev);
 }
 
- // Memaksa background play (Bypass limitasi Android)
-if ('mediaSession' in navigator) {
-  navigator.mediaSession.playbackState = "playing";
-  navigator.mediaSession.setActionHandler('play', function() { ytPlayer.playVideo(); navigator.mediaSession.playbackState = "playing"; });
-  navigator.mediaSession.setActionHandler('pause', function() { ytPlayer.pauseVideo(); navigator.mediaSession.playbackState = "paused"; });
-}
-
-// Menjaga audio tetap hidup saat browser di-minimize (hack untuk Android)
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-const osc = audioContext.createOscillator();
-const gain = audioContext.createGain();
-gain.gain.value = 0;
-osc.connect(gain);
-gain.connect(audioContext.destination);
-osc.start();
-setTimeout(() => { osc.stop(); }, 500); // Memicu sistem bahwa ada audio aktif
 // Kontrol Mini Player & Full Player
 $('mpPlayBtn').addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
 $('mpClose').addEventListener('click', (e) => { 
