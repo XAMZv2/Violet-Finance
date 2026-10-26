@@ -1,5 +1,7 @@
 {
-  "name": "violet-finance-audius",
+  "name": "violet-finance",
   "version": "1.0.0",
-  "dependencies": {}
+  "dependencies": {
+    "youtube-search-api": "^1.2.1"
+  }
 }
