@@ -67,6 +67,8 @@
   /* Full Screen Player */
   .full-player { position: fixed; inset: 0; background: #0a0a0b; z-index: 2000; display: flex; flex-direction: column; padding: 24px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); overflow-y: auto; }
   .full-player.show { transform: translateY(0); }
+  .yt-player-frame { width: 100%; max-width: 480px; aspect-ratio: 16 / 9; min-height: 200px; margin: 0 auto 24px; overflow: hidden; border-radius: 16px; background: #111; }
+  .yt-player-frame iframe { display: block; width: 100% !important; height: 100% !important; }
   .fp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; color: var(--text-secondary); }
   .fp-header svg { width: 24px; height: 24px; fill: currentColor; cursor: pointer; }
   .fp-tag { font-size: 0.7rem; text-align: center; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
@@ -208,7 +210,7 @@
         <input type="text" id="musicSearch" placeholder="Cari lagu di YouTube..." autocomplete="off">
       </div>
       <div class="search-results" id="searchResults"><div class="search-empty">Ketik untuk mencari lagu</div></div>
-      <div id="ytPlayerContainer" style="position:absolute; width:0; height:0; overflow:hidden; opacity:0; pointer-events:none;"></div>
+      
     </div>
   </header>
 
@@ -301,11 +303,12 @@
 <div class="full-player" id="fullPlayer">
   <div class="fp-header">
     <svg id="fpClose" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-    <div class="fp-tag">Sedang Diputar<br><span style="font-size:0.6rem; color:var(--text-muted)">Audio Only · YouTube</span></div>
+    <div class="fp-tag">Sedang Diputar<br><span style="font-size:0.6rem; color:var(--text-muted)">YouTube Player · Background best-effort</span></div>
     <div style="width:24px"></div>
   </div>
-  
-  <img class="fp-cover" id="fpCover" src="" alt="Cover">
+
+  <div id="ytPlayerContainer" class="yt-player-frame" aria-label="Pemutar YouTube"></div>
+  <img class="fp-cover" id="fpCover" src="" alt="Cover" style="display:none">
   
   <div class="fp-info">
     <div>
@@ -589,18 +592,32 @@ function loadYouTubeAPI() {
   window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 }
 
+function syncMediaPlaybackState(state) {
+  if ('mediaSession' in navigator) {
+    try { navigator.mediaSession.playbackState = state; } catch (e) {}
+  }
+}
+
 function onYouTubeIframeAPIReady() {
   ytPlayer = new YT.Player('ytPlayerContainer', {
-    height: '0', width: '0', videoId: '',
-    playerVars: { autoplay: 0, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, rel: 0, iv_load_policy: 3 },
+    height: '270', width: '480', videoId: '',
+    playerVars: { autoplay: 0, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, rel: 0, iv_load_policy: 3, playsinline: 1 },
     events: {
-      onReady: () => ytReady = true,
+      onReady: () => { ytReady = true; },
       onStateChange: (e) => {
-        if (e.data === 1) { isPlaying = true; updatePlayIcons(); startProgress(); }
-        else if (e.data === 2 || e.data === 0) { 
-          isPlaying = false; updatePlayIcons(); stopProgress();
-          if (e.data === 0) handleTrackEnd(); 
+        if (e.data === YT.PlayerState.PLAYING) {
+          isPlaying = true; updatePlayIcons(); startProgress(); syncMediaPlaybackState('playing');
+        } else if (e.data === YT.PlayerState.PAUSED) {
+          isPlaying = false; updatePlayIcons(); stopProgress(); syncMediaPlaybackState('paused');
+        } else if (e.data === YT.PlayerState.ENDED) {
+          isPlaying = false; updatePlayIcons(); stopProgress(); syncMediaPlaybackState('none'); handleTrackEnd();
+        } else if (e.data === YT.PlayerState.CUED) {
+          isPlaying = false; updatePlayIcons(); syncMediaPlaybackState('paused');
         }
+      },
+      onError: () => {
+        isPlaying = false; updatePlayIcons(); stopProgress(); syncMediaPlaybackState('none');
+        showToast('Lagu ini tidak bisa diputar. Coba hasil pencarian lain.');
       }
     }
   });
@@ -646,36 +663,23 @@ function playTrack(index) {
   ytPlayer.unMute(); 
   ytPlayer.setVolume(80);
   
-  // === TRIK AGAR TETAP JALAN DI BACKGROUND ===
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.playbackState = "playing";
-  }
-  try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    gainNode.gain.value = 0;
-    osc.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    osc.start();
-    setTimeout(() => { osc.stop(); }, 1000); 
-  } catch(e) {}
-  // ============================================
+  // Media Session membantu kontrol notifikasi/lock screen, tetapi browser tetap
+  // menentukan apakah audio boleh terus berjalan saat aplikasi diminimalkan.
+  isPlaying = false; updatePlayIcons(); syncMediaPlaybackState('none');
 
-  isPlaying = true; updatePlayIcons(); startProgress();
-  
-  // NOTIFIKASI HP (MEDIA SESSION API)
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: track.title,
-      artist: track.channel,
-      album: 'Violet Finance',
-      artwork: [{ src: track.thumbnail, sizes: '512x512', type: 'image/jpeg' }]
-    });
-    navigator.mediaSession.setActionHandler('play', () => ytPlayer.playVideo());
-    navigator.mediaSession.setActionHandler('pause', () => ytPlayer.pauseVideo());
-    navigator.mediaSession.setActionHandler('previoustrack', () => playPrev());
-    navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
+  if ('mediaSession' in navigator && 'MediaMetadata' in window) {
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: track.title,
+        artist: track.channel,
+        album: 'Violet Finance',
+        artwork: [{ src: track.thumbnail, sizes: '512x512', type: 'image/jpeg' }]
+      });
+      navigator.mediaSession.setActionHandler('play', () => { if (ytPlayer) ytPlayer.playVideo(); });
+      navigator.mediaSession.setActionHandler('pause', () => { if (ytPlayer) ytPlayer.pauseVideo(); });
+      navigator.mediaSession.setActionHandler('previoustrack', () => playPrev());
+      navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
+    } catch (e) {}
   }
   showToast('🎵 Memutar...');
 }
@@ -709,7 +713,7 @@ function playPrev() {
 // Kontrol Mini Player & Full Player
 $('mpPlayBtn').addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
 $('mpClose').addEventListener('click', (e) => { 
-  e.stopPropagation(); ytPlayer.stopVideo(); 
+  e.stopPropagation(); ytPlayer.stopVideo(); syncMediaPlaybackState('none'); 
   $('miniPlayer').classList.remove('show'); $('fullPlayer').classList.remove('show'); 
   isPlaying = false; updatePlayIcons(); stopProgress();
 });
