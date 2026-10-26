@@ -2,13 +2,13 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Violet Finance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
     --bg: #0a0a0b; --bg-card: #141416; --bg-input: #1c1c20; --border: #26262b;
     --border-focus: #4a4a52; --text: #f0f0f2; --text-secondary: #9a9aa3;
@@ -16,7 +16,7 @@
     --green: #4ade80; --green-bg: #14291c; --red: #f87171; --red-bg: #2a1618;
     --amber: #fbbf24; --amber-bg: #2a2114;
   }
-  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); min-height: 100vh; padding: 16px; padding-bottom: 100px; -webkit-font-smoothing: antialiased; }
+  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); min-height: 100vh; padding: 16px; padding-bottom: 100px; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   .container { max-width: 480px; margin: 0 auto; }
   
   /* Header & Audio */
@@ -48,13 +48,14 @@
   .search-item-artist { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
   .search-loading, .search-empty { text-align: center; font-size: 0.8rem; color: var(--text-muted); padding: 10px; }
 
-  .mini-player { position: fixed; bottom: 16px; left: 16px; right: 16px; max-width: 448px; margin: 0 auto; background: rgba(20, 20, 22, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 16px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); transform: translateY(120px); transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 1000; }
+  /* Mini Player */
+  .mini-player { position: fixed; bottom: 16px; left: 16px; right: 16px; max-width: 448px; margin: 0 auto; background: rgba(20, 20, 22, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 16px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); transform: translateY(150px); transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 1000; cursor: pointer; }
   .mini-player.show { transform: translateY(0); }
   .mp-cover { width: 42px; height: 42px; border-radius: 8px; object-fit: cover; background: var(--bg-input); }
   .mp-info { flex: 1; min-width: 0; }
   .mp-title { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .mp-artist { font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-  .mp-controls { display: flex; align-items: center; gap: 8px; }
+  .mp-controls { display: flex; align-items: center; gap: 4px; }
   .mp-btn { background: none; border: none; color: var(--text); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
   .mp-btn:hover { background: var(--bg-input); }
   .mp-btn.play-btn { background: var(--accent); color: white; }
@@ -62,6 +63,29 @@
   .mp-btn svg { width: 18px; height: 18px; fill: currentColor; }
   .mp-close { font-size: 1.2rem; color: var(--text-muted); line-height: 1; }
   .mp-close:hover { color: var(--red); background: transparent; }
+
+  /* Full Screen Player */
+  .full-player { position: fixed; inset: 0; background: #0a0a0b; z-index: 2000; display: flex; flex-direction: column; padding: 24px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); overflow-y: auto; }
+  .full-player.show { transform: translateY(0); }
+  .fp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; color: var(--text-secondary); }
+  .fp-header svg { width: 24px; height: 24px; fill: currentColor; cursor: pointer; }
+  .fp-tag { font-size: 0.7rem; text-align: center; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
+  .fp-cover { width: 100%; aspect-ratio: 1; border-radius: 20px; object-fit: cover; box-shadow: 0 20px 50px rgba(0,0,0,0.5); margin-bottom: 30px; }
+  .fp-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+  .fp-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.5px; }
+  .fp-artist { font-size: 1rem; color: var(--text-secondary); }
+  .fp-like { color: var(--accent); width: 28px; height: 28px; }
+  .fp-progress { margin-bottom: 20px; }
+  .fp-bar { height: 4px; background: var(--bg-input); border-radius: 2px; position: relative; cursor: pointer; margin-bottom: 8px; }
+  .fp-bar-fill { height: 100%; background: var(--text); border-radius: 2px; width: 0%; position: relative; }
+  .fp-bar-fill::after { content: ''; position: absolute; right: -6px; top: -4px; width: 12px; height: 12px; background: var(--text); border-radius: 50%; }
+  .fp-time { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); }
+  .fp-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+  .fp-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .fp-btn.active { color: var(--accent); }
+  .fp-btn svg { width: 24px; height: 24px; fill: currentColor; }
+  .fp-btn-main { width: 70px; height: 70px; border-radius: 50%; background: #c4d1eb; color: #0a0a0b; display: flex; align-items: center; justify-content: center; }
+  .fp-btn-main svg { width: 32px; height: 32px; }
 
   /* UI Keuangan */
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 14px; }
@@ -158,7 +182,7 @@
   .btn-ghost { background: var(--bg-input); color: var(--text-secondary); border: 1px solid var(--border); box-shadow: none; }
   .info-note { font-size: 0.72rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5; padding: 10px 12px; background: var(--bg-input); border-radius: 10px; }
   .clear-btn { background: none; border: none; color: var(--red); font-size: 0.75rem; cursor: pointer; font-weight: 600; opacity: 0.8; }
-  .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: #222226; border: 1px solid var(--border); color: var(--text); padding: 12px 22px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; transition: transform 0.35s; z-index: 2000; box-shadow: 0 8px 32px rgba(0,0,0,0.5); white-space: nowrap; }
+  .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: #222226; border: 1px solid var(--border); color: var(--text); padding: 12px 22px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; transition: transform 0.35s; z-index: 3000; box-shadow: 0 8px 32px rgba(0,0,0,0.5); white-space: nowrap; }
   .toast.show { transform: translateX(-50%) translateY(0); }
 </style>
 </head>
@@ -263,19 +287,67 @@
   </section>
 </div>
 
+<!-- MINI PLAYER -->
 <div class="mini-player" id="miniPlayer">
   <img class="mp-cover" id="mpCover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='42' fill='%2326262b'/%3E" alt="cover">
   <div class="mp-info"><div class="mp-title" id="mpTitle">Belum ada lagu</div><div class="mp-artist" id="mpArtist">-</div></div>
-  <div class="mp-controls">
+  <div class="mp-controls" onclick="event.stopPropagation()">
     <button class="mp-btn play-btn" id="mpPlayBtn"><svg id="mpPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
     <button class="mp-btn mp-close" id="mpClose">×</button>
+  </div>
+</div>
+
+<!-- FULL SCREEN PLAYER -->
+<div class="full-player" id="fullPlayer">
+  <div class="fp-header">
+    <svg id="fpClose" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+    <div class="fp-tag">Sedang Diputar<br><span style="font-size:0.6rem; color:var(--text-muted)">Audio Only · YouTube</span></div>
+    <div style="width:24px"></div>
+  </div>
+  
+  <img class="fp-cover" id="fpCover" src="" alt="Cover">
+  
+  <div class="fp-info">
+    <div>
+      <div class="fp-title" id="fpTitle">Judul Lagu</div>
+      <div class="fp-artist" id="fpArtist">Artis</div>
+    </div>
+    <svg class="fp-like" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+  </div>
+
+  <div class="fp-progress">
+    <div class="fp-bar" id="fpBar">
+      <div class="fp-bar-fill" id="fpBarFill"></div>
+    </div>
+    <div class="fp-time">
+      <span id="fpCurrentTime">0:00</span>
+      <span id="fpDuration">0:00</span>
+    </div>
+  </div>
+
+  <div class="fp-controls">
+    <button class="fp-btn" id="fpShuffle" title="Acak">
+      <svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+    </button>
+    <button class="fp-btn" id="fpPrev">
+      <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+    </button>
+    <button class="fp-btn-main" id="fpPlayBtn">
+      <svg id="fpPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <button class="fp-btn" id="fpNext">
+      <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+    </button>
+    <button class="fp-btn" id="fpRepeat" title="Ulangi">
+      <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+    </button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-/* ===== KATEGORI & STATE ===== */
+/* ===== LOGIKA KEUANGAN ===== */
 const CATEGORIES = {
   income: [
     { value: 'Uang Saku', label: '💰 Uang Saku', hint: 'Harian, mingguan, atau bulanan dari orang tua.' },
@@ -303,6 +375,7 @@ const formatThousands = (str) => { const d = str.replace(/\D/g, ''); return d ? 
 const save = () => localStorage.setItem('violet_finance_tx', JSON.stringify(transactions));
 const saveGoal = () => localStorage.setItem('violet_finance_goal', JSON.stringify(goal));
 const escapeHtml = (str) => str.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const formatTime = (s) => { if(!s || isNaN(s)) return '0:00'; const m = Math.floor(s/60); const sec = Math.floor(s%60); return m + ':' + (sec<10?'0':'') + sec; };
 
 function showToast(msg) {
   const t = $('toast'); t.textContent = msg; t.classList.add('show');
@@ -312,15 +385,12 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
-/* ===== LOGIKA KEUANGAN ===== */
 function setType(type) {
   currentType = type;
   $('btnIncome').className = 'type-btn' + (type === 'income' ? ' active-income' : '');
   $('btnExpense').className = 'type-btn' + (type === 'expense' ? ' active-expense' : '');
-  
   $('category').innerHTML = CATEGORIES[type].map(c => `<option value="${c.value}">${c.label}${c.group ? ' — ' + c.group : ''}</option>`).join('');
   updateCategoryHint();
-
   if (type === 'income') {
     $('saveOption').style.display = 'flex';
     $('saveOption').style.opacity = goal ? '1' : '0.5';
@@ -341,40 +411,29 @@ function addTransaction() {
   const raw = $('amount').value.replace(/\./g, '');
   const amount = parseInt(raw, 10);
   const isSaving = currentType === 'income' && $('chkSave').checked;
-  
   if (!amount || amount <= 0) { showToast('⚠️ Masukkan jumlah valid'); return; }
   if (isSaving && !goal) { showToast('⚠️ Buat target tabungan dulu'); return; }
-
   const now = new Date();
   const txDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
-
   transactions.unshift({
-    id: Date.now(),
-    type: isSaving ? 'saving' : currentType,
-    amount,
+    id: Date.now(), type: isSaving ? 'saving' : currentType, amount,
     category: isSaving ? 'Tabungan' : $('category').value,
-    note: isSaving ? goal.name : $('note').value.trim(),
-    date: txDate.toISOString()
+    note: isSaving ? goal.name : $('note').value.trim(), date: txDate.toISOString()
   });
-
   save(); renderAll();
   $('amount').value = ''; $('note').value = ''; $('chkSave').checked = false;
   showToast(isSaving ? '💎 Masuk tabungan!' : (currentType === 'income' ? '✅ Pemasukan dicatat!' : '✅ Pengeluaran dicatat!'));
 }
-
 function deleteTransaction(id) {
   if (!confirm('Hapus transaksi ini?')) return;
   transactions = transactions.filter(t => t.id !== id);
   save(); renderAll(); showToast('🗑️ Transaksi dihapus');
 }
-
 function clearAll() {
   if (!transactions.length) return showToast('Belum ada transaksi');
   if (!confirm('Hapus semua riwayat?')) return;
   transactions = []; save(); renderAll(); showToast('🗑️ Semua transaksi dihapus');
 }
-
-/* ===== RENDER UI ===== */
 function isSameMonth(iso, ref) { const d = new Date(iso); return d.getFullYear() === ref.getFullYear() && d.getMonth() === ref.getMonth(); }
 function monthTransactions() { return transactions.filter(t => isSameMonth(t.date, viewDate)); }
 
@@ -392,7 +451,6 @@ function renderBalance() {
   $('totalIncome').textContent = fmtRupiah(income);
   $('totalExpense').textContent = fmtRupiah(expense);
   $('uangTabungan').textContent = fmtRupiah(saving);
-  
   const label = viewDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
   const now = new Date();
   const isCur = viewDate.getMonth() === now.getMonth() && viewDate.getFullYear() === now.getFullYear();
@@ -405,12 +463,10 @@ function renderTransactions() {
   const monthly = monthTransactions();
   let filtered = monthly;
   if (currentFilter !== 'all') filtered = monthly.filter(t => t.type === currentFilter);
-
   if (!filtered.length) {
     $('transactionList').innerHTML = '<div class="empty-state">📭<br>Belum ada transaksi</div>';
     return;
   }
-
   $('transactionList').innerHTML = filtered.map(t => {
     let catLbl, ico, cls, pfx, badge = '';
     if (t.type === 'saving') {
@@ -442,7 +498,6 @@ function renderSummary() {
   const grp = {}; exp.forEach(t => grp[t.category] = (grp[t.category] || 0) + t.amount);
   const tot = Object.values(grp).reduce((a,b) => a+b, 0);
   const sorted = Object.entries(grp).sort((a,b) => b[1]-a[1]);
-  
   $('categorySummary').innerHTML = sorted.map(([cat, amt]) => {
     const c = CATEGORIES.expense.find(x => x.value === cat);
     const pct = ((amt/tot)*100).toFixed(0);
@@ -457,7 +512,6 @@ function renderChart() {
   const grp = {}; exp.forEach(t => grp[t.category] = (grp[t.category] || 0) + t.amount);
   const tot = Object.values(grp).reduce((a,b) => a+b, 0);
   const sorted = Object.entries(grp).sort((a,b) => b[1]-a[1]);
-  
   const cx=65, cy=65, r=52, sw=16, circ=2*Math.PI*r;
   let off=0, paths='';
   sorted.forEach(([cat, amt], i) => {
@@ -467,7 +521,6 @@ function renderChart() {
   });
   $('donutSvg').innerHTML = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1c1c20" stroke-width="${sw}"/>${paths}`;
   $('donutTotal').textContent = fmtRupiah(tot);
-  
   $('chartLegend').innerHTML = sorted.map(([cat, amt], i) => {
     const c = CATEGORIES.expense.find(x => x.value === cat);
     return `<div class="legend-item"><span class="legend-dot" style="background:${CHART_COLORS[i%CHART_COLORS.length]}"></span><span class="legend-name">${c ? c.label.replace(/^[^\s]+\s/, '') : cat}</span><span class="legend-pct">${((amt/tot)*100).toFixed(0)}%</span></div>`;
@@ -491,25 +544,21 @@ function renderGoal() {
     });
     return;
   }
-  
   const saved = transactions.filter(t => t.type === 'saving').reduce((a,b) => a+b.amount, 0);
   const pct = Math.min(100, (saved/goal.target)*100);
   const done = saved >= goal.target;
-  
   $('goalContent').innerHTML = `
     <div class="goal-header"><span class="goal-name">${escapeHtml(goal.name)}</span><span class="goal-target">Target ${fmtRupiah(goal.target)}</span></div>
     <div class="progress-track"><div class="progress-fill ${done ? 'done' : ''}" style="width:${pct}%"></div></div>
     <div class="goal-footer"><span>Terkumpul <strong class="amber">${fmtRupiah(saved)}</strong></span><span>${pct.toFixed(0)}%</span></div>
     ${done ? '<div class="goal-done-badge">🎉 Target tercapai!</div>' : `<div class="goal-footer" style="margin-top:6px"><span>Sisa <strong>${fmtRupiah(goal.target-saved)}</strong></span></div>`}
     <div class="goal-actions"><button class="btn btn-ghost" id="btnEditGoal">✏️ Ganti</button><button class="btn btn-ghost" id="btnResetGoal" style="color:var(--red)">🗑️ Hapus</button></div>`;
-    
   $('btnEditGoal').addEventListener('click', () => { goal = null; saveGoal(); setType(currentType); renderGoal(); });
   $('btnResetGoal').addEventListener('click', () => { if(confirm('Hapus target?')) { goal = null; saveGoal(); setType(currentType); renderGoal(); } });
 }
 
 function renderAll() { renderBalance(); renderGoal(); renderChart(); renderTransactions(); renderSummary(); }
 
-/* ===== EVENT KEUANGAN ===== */
 $('amount').addEventListener('input', e => e.target.value = formatThousands(e.target.value));
 $('btnIncome').addEventListener('click', () => setType('income'));
 $('btnExpense').addEventListener('click', () => setType('expense'));
@@ -526,8 +575,11 @@ document.querySelectorAll('.filter-tab').forEach(tab => {
 $('prevMonth').addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth()-1); viewDate = new Date(viewDate); renderAll(); });
 $('nextMonth').addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth()+1); viewDate = new Date(viewDate); renderAll(); });
 
-/* ===== AUDIO PLAYER (YOUTUBE) ===== */
-let ytPlayer = null, ytReady = false, currentVideoId = null, isPlaying = false;
+
+/* ===== AUDIO PLAYER LENGKAP ===== */
+let ytPlayer = null, ytReady = false, isPlaying = false;
+let playlist = [], currentIndex = -1, isShuffle = false, isRepeat = false;
+let progressInterval = null;
 
 function loadYouTubeAPI() {
   if (window.YT && window.YT.Player) { onYouTubeIframeAPIReady(); return; }
@@ -544,8 +596,11 @@ function onYouTubeIframeAPIReady() {
     events: {
       onReady: () => ytReady = true,
       onStateChange: (e) => {
-        if (e.data === 1) { isPlaying = true; updatePlayIcon(); }
-        else if (e.data === 2 || e.data === 0) { isPlaying = false; updatePlayIcon(); }
+        if (e.data === 1) { isPlaying = true; updatePlayIcons(); startProgress(); }
+        else if (e.data === 2 || e.data === 0) { 
+          isPlaying = false; updatePlayIcons(); stopProgress();
+          if (e.data === 0) handleTrackEnd(); 
+        }
       }
     }
   });
@@ -567,36 +622,127 @@ $('musicSearch').addEventListener('input', () => {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
       const data = await res.json();
       if (!data.videos || !data.videos.length) { $('searchResults').innerHTML = '<div class="search-empty">Lagu tidak ditemukan</div>'; return; }
-      $('searchResults').innerHTML = data.videos.map(v => `
-        <div class="search-item" data-id="${v.videoId}" data-title="${escapeHtml(v.title)}" data-ch="${escapeHtml(v.channel)}" data-thumb="${v.thumbnail}">
+      
+      playlist = data.videos;
+      $('searchResults').innerHTML = data.videos.map((v, i) => `
+        <div class="search-item" onclick="playTrack(${i})">
           <img src="${v.thumbnail}" loading="lazy">
           <div class="search-item-info"><div class="search-item-title">${escapeHtml(v.title)}</div><div class="search-item-artist">${escapeHtml(v.channel)}</div></div>
         </div>`).join('');
-      
-      document.querySelectorAll('.search-item').forEach(el => {
-        el.addEventListener('click', () => {
-          if (!ytReady) return showToast('⏳ Player loading, coba lagi...');
-          const id = el.dataset.id;
-          $('mpCover').src = el.dataset.thumb; $('mpTitle').textContent = el.dataset.title; $('mpArtist').textContent = el.dataset.ch;
-          $('miniPlayer').classList.add('show');
-          ytPlayer.loadVideoById(id); ytPlayer.unMute(); ytPlayer.setVolume(80);
-          isPlaying = true; updatePlayIcon(); currentVideoId = id;
-          showToast('🎵 Memutar...');
-        });
-      });
     } catch(e) { $('searchResults').innerHTML = '<div class="search-empty">Error server</div>'; }
   }, 600);
 });
 
-function updatePlayIcon() {
-  $('mpPlayIcon').innerHTML = isPlaying ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
+function playTrack(index) {
+  if (!ytReady) return showToast('⏳ Player loading...');
+  currentIndex = index;
+  const track = playlist[index];
+  
+  // Update UI Mini & Full
+  $('mpCover').src = track.thumbnail; $('mpTitle').textContent = track.title; $('mpArtist').textContent = track.channel;
+  $('fpCover').src = track.thumbnail; $('fpTitle').textContent = track.title; $('fpArtist').textContent = track.channel;
+  
+  $('miniPlayer').classList.add('show');
+  ytPlayer.loadVideoById(track.videoId); 
+  ytPlayer.unMute(); ytPlayer.setVolume(80);
+  isPlaying = true; updatePlayIcons(); startProgress();
+  
+  // NOTIFIKASI HP (MEDIA SESSION API)
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title,
+      artist: track.channel,
+      album: 'Violet Finance',
+      artwork: [{ src: track.thumbnail, sizes: '512x512', type: 'image/jpeg' }]
+    });
+    navigator.mediaSession.setActionHandler('play', () => ytPlayer.playVideo());
+    navigator.mediaSession.setActionHandler('pause', () => ytPlayer.pauseVideo());
+    navigator.mediaSession.setActionHandler('previoustrack', () => playPrev());
+    navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
+  }
+  
+  showToast('🎵 Memutar...');
 }
-$('mpPlayBtn').addEventListener('click', () => { if (!ytPlayer || !currentVideoId) return; if (ytPlayer.getPlayerState() === 1) ytPlayer.pauseVideo(); else ytPlayer.playVideo(); });
-$('mpClose').addEventListener('click', () => { if (ytPlayer) ytPlayer.stopVideo(); $('miniPlayer').classList.remove('show'); isPlaying = false; currentVideoId = null; updatePlayIcon(); });
+
+function updatePlayIcons() {
+  const icon = isPlaying ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
+  $('mpPlayIcon').innerHTML = icon;
+  $('fpPlayIcon').innerHTML = icon;
+}
+
+function handleTrackEnd() {
+  if (isRepeat) { playTrack(currentIndex); return; }
+  playNext();
+}
+
+function playNext() {
+  if (!playlist.length) return;
+  if (isShuffle) { playTrack(Math.floor(Math.random() * playlist.length)); return; }
+  let next = currentIndex + 1;
+  if (next >= playlist.length) next = 0;
+  playTrack(next);
+}
+
+function playPrev() {
+  if (!playlist.length) return;
+  let prev = currentIndex - 1;
+  if (prev < 0) prev = playlist.length - 1;
+  playTrack(prev);
+}
+
+// Kontrol Mini Player & Full Player
+$('mpPlayBtn').addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
+$('mpClose').addEventListener('click', (e) => { 
+  e.stopPropagation(); ytPlayer.stopVideo(); 
+  $('miniPlayer').classList.remove('show'); $('fullPlayer').classList.remove('show'); 
+  isPlaying = false; updatePlayIcons(); stopProgress();
+});
+$('miniPlayer').addEventListener('click', () => { $('fullPlayer').classList.add('show'); });
+$('fpClose').addEventListener('click', () => { $('fullPlayer').classList.remove('show'); });
+$('fpPlayBtn').addEventListener('click', togglePlay);
+$('fpNext').addEventListener('click', playNext);
+$('fpPrev').addEventListener('click', playPrev);
+
+$('fpShuffle').addEventListener('click', function() { 
+  isShuffle = !isShuffle; this.classList.toggle('active', isShuffle); 
+  showToast(isShuffle ? '🔀 Acak: Nyala' : '🔀 Acak: Mati');
+});
+$('fpRepeat').addEventListener('click', function() { 
+  isRepeat = !isRepeat; this.classList.toggle('active', isRepeat); 
+  showToast(isRepeat ? '🔁 Ulangi: Nyala' : '🔁 Ulangi: Mati');
+});
+
+function togglePlay() {
+  if (!ytPlayer || !playlist.length) return;
+  if (isPlaying) ytPlayer.pauseVideo(); else ytPlayer.playVideo();
+}
+
+// Progress Bar
+function startProgress() {
+  stopProgress();
+  progressInterval = setInterval(() => {
+    if (!ytPlayer || !ytPlayer.getDuration) return;
+    const cur = ytPlayer.getCurrentTime();
+    const dur = ytPlayer.getDuration();
+    if (dur > 0) {
+      $('fpBarFill').style.width = (cur / dur * 100) + '%';
+      $('fpCurrentTime').textContent = formatTime(cur);
+      $('fpDuration').textContent = formatTime(dur);
+    }
+  }, 1000);
+}
+function stopProgress() { clearInterval(progressInterval); }
+
+$('fpBar').addEventListener('click', (e) => {
+  if (!ytPlayer || !ytPlayer.getDuration) return;
+  const rect = $('fpBar').getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  ytPlayer.seekTo(pct * ytPlayer.getDuration(), true);
+});
 
 /* ===== INIT ===== */
 setType('expense');
 renderAll();
 </script>
 </body>
-  </html>
+</html>
