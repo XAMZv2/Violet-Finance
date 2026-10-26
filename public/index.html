@@ -690,6 +690,22 @@ function playPrev() {
   playTrack(prev);
 }
 
+ // Memaksa background play (Bypass limitasi Android)
+if ('mediaSession' in navigator) {
+  navigator.mediaSession.playbackState = "playing";
+  navigator.mediaSession.setActionHandler('play', function() { ytPlayer.playVideo(); navigator.mediaSession.playbackState = "playing"; });
+  navigator.mediaSession.setActionHandler('pause', function() { ytPlayer.pauseVideo(); navigator.mediaSession.playbackState = "paused"; });
+}
+
+// Menjaga audio tetap hidup saat browser di-minimize (hack untuk Android)
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const osc = audioContext.createOscillator();
+const gain = audioContext.createGain();
+gain.gain.value = 0;
+osc.connect(gain);
+gain.connect(audioContext.destination);
+osc.start();
+setTimeout(() => { osc.stop(); }, 500); // Memicu sistem bahwa ada audio aktif
 // Kontrol Mini Player & Full Player
 $('mpPlayBtn').addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
 $('mpClose').addEventListener('click', (e) => { 
