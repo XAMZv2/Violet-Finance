@@ -10,44 +10,82 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
-    --bg: #0a0a0b; --bg-card: #141416; --bg-input: #1c1c20; --border: #26262b;
-    --border-focus: #4a4a52; --text: #f0f0f2; --text-secondary: #9a9aa3;
-    --text-muted: #5a5a63; --accent: #a78bfa; --accent-dim: #7c3aed;
-    --green: #4ade80; --green-bg: #14291c; --red: #f87171; --red-bg: #2a1618;
-    --amber: #fbbf24; --amber-bg: #2a2114;
+    --bg: #101112; --bg-card: #191a1c; --bg-input: #222326; --border: #303135;
+    --border-focus: #62636a; --text: #f2f2f3; --text-secondary: #b0b1b5;
+    --text-muted: #777980; --accent: #a5a6ad; --accent-dim: #777981;
+    --green: #65c995; --green-bg: #17291f; --red: #f08080; --red-bg: #2a1b1d;
+    --amber: #e4bd70; --amber-bg: #2a251a;
   }
   body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); min-height: 100vh; padding: 16px; padding-bottom: 100px; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   .container { max-width: 480px; margin: 0 auto; }
   
-  /* Header action & budget panel */
+  /* Header & Audio */
   header { padding: 20px 4px; }
   .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .brand { display: flex; align-items: center; gap: 12px; }
-  .brand-logo { width: 44px; height: 44px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%); border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #fff; box-shadow: 0 4px 24px rgba(167, 139, 250, 0.3); }
+  .brand-logo { width: 44px; height: 44px; background: linear-gradient(135deg, #777981 0%, #414248 100%); border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #fff; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22); }
   .brand-text h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px; }
   .brand-text p { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
   .audio-trigger { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
-  .audio-trigger:hover, .audio-trigger[aria-expanded="true"] { color: var(--accent); border-color: var(--accent-dim); }
-  .audio-trigger svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; }
-  .budget-panel { animation: slideDown 0.2s ease-out; }
-  .budget-help { color: var(--text-secondary); font-size: 0.78rem; line-height: 1.5; margin: -4px 0 16px; }
-  .budget-list { margin-top: 18px; }
-  .budget-empty { color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 16px 0 4px; }
-  .budget-item { padding: 14px 0; border-bottom: 1px solid var(--border); }
-  .budget-item:last-child { border-bottom: 0; }
-  .budget-item-head, .budget-item-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .budget-item-head { font-size: 0.82rem; font-weight: 700; margin-bottom: 8px; }
-  .budget-status { font-size: 0.68rem; font-weight: 700; border-radius: 6px; padding: 4px 7px; background: var(--green-bg); color: var(--green); white-space: nowrap; }
-  .budget-status.warn { background: var(--amber-bg); color: var(--amber); }
-  .budget-status.over { background: var(--red-bg); color: var(--red); }
-  .budget-track { height: 8px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
-  .budget-fill { height: 100%; border-radius: 8px; background: var(--green); transition: width .25s; }
-  .budget-fill.warn { background: var(--amber); }
-  .budget-fill.over { background: var(--red); }
-  .budget-item-foot { color: var(--text-secondary); font-size: 0.72rem; }
-  .budget-delete { border: 0; background: transparent; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; padding: 2px 5px; }
-  .budget-delete:hover { color: var(--red); }
-  @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  .audio-trigger:hover { color: var(--text); border-color: var(--border-focus); }
+  .audio-trigger svg { width: 18px; height: 18px; fill: currentColor; }
+
+  .search-panel { display: none; margin-top: 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; animation: slideDown 0.2s ease-out; }
+  .search-panel.show { display: block; }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  .search-input-wrap { position: relative; display: flex; align-items: center; margin-bottom: 12px; }
+  .search-input-wrap svg { position: absolute; left: 12px; width: 16px; height: 16px; fill: var(--text-muted); pointer-events: none; }
+  .search-input-wrap input { width: 100%; padding: 10px 10px 10px 36px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 0.85rem; font-family: inherit; outline: none; }
+  .search-input-wrap input:focus { border-color: var(--border-focus); }
+  .search-results { max-height: 220px; overflow-y: auto; margin-right: -4px; padding-right: 4px; display: flex; flex-direction: column; gap: 8px; }
+  .search-results::-webkit-scrollbar { width: 4px; }
+  .search-results::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .search-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 10px; cursor: pointer; transition: background 0.2s; }
+  .search-item:hover { background: var(--bg-input); }
+  .search-item img { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; }
+  .search-item-info { flex: 1; min-width: 0; }
+  .search-item-title { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .search-item-artist { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .search-loading, .search-empty { text-align: center; font-size: 0.8rem; color: var(--text-muted); padding: 10px; }
+
+  /* Mini Player */
+  .mini-player { position: fixed; bottom: 16px; left: 16px; right: 16px; max-width: 448px; margin: 0 auto; background: rgba(20, 20, 22, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 16px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); transform: translateY(150px); transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 1000; cursor: pointer; }
+  .mini-player.show { transform: translateY(0); }
+  .mp-cover { width: 42px; height: 42px; border-radius: 8px; object-fit: cover; background: var(--bg-input); }
+  .mp-info { flex: 1; min-width: 0; }
+  .mp-title { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mp-artist { font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .mp-controls { display: flex; align-items: center; gap: 4px; }
+  .mp-btn { background: none; border: none; color: var(--text); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
+  .mp-btn:hover { background: var(--bg-input); }
+  .mp-btn.play-btn { background: var(--accent); color: white; }
+  .mp-btn.play-btn:hover { background: var(--accent-dim); }
+  .mp-btn svg { width: 18px; height: 18px; fill: currentColor; }
+  .mp-close { font-size: 1.2rem; color: var(--text-muted); line-height: 1; }
+  .mp-close:hover { color: var(--red); background: transparent; }
+
+  /* Full Screen Player */
+  .full-player { position: fixed; inset: 0; background: #0a0a0b; z-index: 2000; display: flex; flex-direction: column; padding: 24px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); overflow-y: auto; }
+  .full-player.show { transform: translateY(0); }
+  .fp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; color: var(--text-secondary); }
+  .fp-header svg { width: 24px; height: 24px; fill: currentColor; cursor: pointer; }
+  .fp-tag { font-size: 0.7rem; text-align: center; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
+  .fp-cover { width: 100%; aspect-ratio: 1; border-radius: 20px; object-fit: cover; box-shadow: 0 20px 50px rgba(0,0,0,0.5); margin-bottom: 30px; }
+  .fp-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+  .fp-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.5px; }
+  .fp-artist { font-size: 1rem; color: var(--text-secondary); }
+  .fp-like { color: var(--accent); width: 28px; height: 28px; }
+  .fp-progress { margin-bottom: 20px; }
+  .fp-bar { height: 4px; background: var(--bg-input); border-radius: 2px; position: relative; cursor: pointer; margin-bottom: 8px; }
+  .fp-bar-fill { height: 100%; background: var(--text); border-radius: 2px; width: 0%; position: relative; }
+  .fp-bar-fill::after { content: ''; position: absolute; right: -6px; top: -4px; width: 12px; height: 12px; background: var(--text); border-radius: 50%; }
+  .fp-time { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); }
+  .fp-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+  .fp-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .fp-btn.active { color: var(--accent); }
+  .fp-btn svg { width: 24px; height: 24px; fill: currentColor; }
+  .fp-btn-main { width: 70px; height: 70px; border-radius: 50%; background: #c4d1eb; color: #0a0a0b; display: flex; align-items: center; justify-content: center; }
+  .fp-btn-main svg { width: 32px; height: 32px; }
 
   /* UI Keuangan */
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 14px; }
@@ -56,8 +94,8 @@
   .month-bar button:hover { color: var(--text); border-color: var(--border-focus); }
   .month-bar .month-label { flex: 1; text-align: center; font-weight: 700; font-size: 0.9rem; }
   .month-bar .month-label small { display: block; font-size: 0.65rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; margin-top: 1px; }
-  .balance-card { background: linear-gradient(145deg, #1a1a1e 0%, #121214 100%); position: relative; overflow: hidden; }
-  .balance-card::before { content: ''; position: absolute; top: -60%; right: -30%; width: 220px; height: 220px; background: radial-gradient(circle, rgba(167,139,250,0.15) 0%, transparent 70%); pointer-events: none; }
+  .balance-card { background: linear-gradient(145deg, #202124 0%, #191a1c 100%); position: relative; overflow: hidden; }
+  .balance-card::before { content: ''; position: absolute; top: -60%; right: -30%; width: 220px; height: 220px; background: radial-gradient(circle, rgba(255,255,255,0.055) 0%, transparent 70%); pointer-events: none; }
   .balance-label { font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 8px; }
   .balance-amount { font-size: 2.3rem; font-weight: 800; letter-spacing: -1.2px; margin-bottom: 18px; }
   .balance-amount.negative { color: var(--red); }
@@ -92,7 +130,7 @@
   .save-option .so-text { flex: 1; }
   .save-option .so-title { font-size: 0.85rem; font-weight: 700; color: var(--amber); margin-bottom: 2px; }
   .save-option .so-desc { font-size: 0.72rem; color: var(--text-secondary); line-height: 1.4; }
-  .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 700; cursor: pointer; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%); color: #fff; font-family: inherit; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35); transition: transform 0.1s; }
+  .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 700; cursor: pointer; background: linear-gradient(135deg, #777981 0%, #414248 100%); color: #fff; font-family: inherit; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.24); transition: transform 0.1s; }
   .btn:active { transform: scale(0.98); }
   .btn-amber { background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%); box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3); }
   .filter-tabs { display: flex; gap: 6px; margin-bottom: 14px; background: var(--bg-input); padding: 4px; border-radius: 10px; border: 1px solid var(--border); }
@@ -146,6 +184,36 @@
   .clear-btn { background: none; border: none; color: var(--red); font-size: 0.75rem; cursor: pointer; font-weight: 600; opacity: 0.8; }
   .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: #222226; border: 1px solid var(--border); color: var(--text); padding: 12px 22px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; transition: transform 0.35s; z-index: 3000; box-shadow: 0 8px 32px rgba(0,0,0,0.5); white-space: nowrap; }
   .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .action-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:0 0 14px; }
+  .utility-btn { border:1px solid var(--border); background:var(--bg-card); color:var(--text); padding:11px 10px; border-radius:11px; font:600 .76rem Inter,sans-serif; cursor:pointer; }
+  .utility-btn:active { transform:scale(.98); }
+  .insight-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .insight { background:var(--bg-input); border:1px solid var(--border); border-radius:12px; padding:12px; min-width:0; }
+  .insight-label { font-size:.68rem; color:var(--text-secondary); margin-bottom:6px; }
+  .insight-value { font-size:.91rem; font-weight:750; overflow-wrap:anywhere; }
+  .insight-sub { font-size:.68rem; color:var(--text-muted); margin-top:5px; line-height:1.4; }
+  .budget-form { display:grid; grid-template-columns:minmax(0,1fr) minmax(90px,.8fr); gap:8px; margin:12px 0; }
+  .budget-form select,.budget-form input,.goal-form input { min-width:0; width:100%; }
+  .budget-row { padding:12px 0; border-bottom:1px solid var(--border); }
+  .budget-row:last-child { border-bottom:0; padding-bottom:0; }
+  .budget-row-head,.budget-row-meta { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:.77rem; }
+  .budget-row-meta { color:var(--text-secondary); font-size:.7rem; margin-top:7px; }
+  .budget-track { height:6px; background:var(--bg-input); border-radius:99px; overflow:hidden; margin-top:8px; }
+  .budget-fill { height:100%; background:var(--green); border-radius:99px; transition:width .2s; }
+  .budget-fill.warn { background:var(--amber); } .budget-fill.over { background:var(--red); }
+  .budget-row-actions { display:flex; gap:6px; }
+  .small-action { border:0; background:transparent; color:var(--text-secondary); font:600 .7rem Inter,sans-serif; padding:4px; cursor:pointer; }
+  .goal-list { display:grid; gap:10px; }
+  .goal-item { border:1px solid var(--border); background:var(--bg-input); padding:13px; border-radius:13px; }
+  .goal-item .goal-header { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+  .goal-item .goal-actions { margin-top:10px; }
+  .goal-form { margin-top:12px; }
+  .inline-select { width:100%; margin-top:8px; padding:8px; border:1px solid var(--border); background:var(--bg-input); color:var(--text); border-radius:9px; font:inherit; }
+  .notice { padding:10px 12px; border-radius:10px; font-size:.75rem; line-height:1.45; margin-top:8px; background:var(--amber-bg); color:var(--amber); }
+  .empty-inline { color:var(--text-muted); font-size:.8rem; line-height:1.5; padding:8px 0; }
+  @media (min-width:600px) { .container { max-width:620px; } .insight-grid { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+
 </style>
 </head>
 <body>
@@ -159,25 +227,19 @@
           <p>Kelola uangmu, raih mimpimu</p>
         </div>
       </div>
-      <button class="audio-trigger" id="budgetTrigger" title="Anggaran Bulanan" aria-expanded="false">
-        <svg viewBox="0 0 24 24"><path d="M3 5h18v14H3z" stroke="currentColor" stroke-width="2"/><path d="M7 9h4M7 13h10M7 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <button class="audio-trigger" id="audioTrigger" title="Cari & Putar Lagu">
+        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
       </button>
     </div>
     
-    <section class="card budget-panel" id="budgetPanel" style="display:none">
-      <div class="section-title">Anggaran Bulanan <span id="budgetMonthLabel"></span></div>
-      <p class="budget-help">Atur batas pengeluaran per kategori. Pemakaian dihitung dari transaksi di bulan yang sedang dipilih.</p>
-      <div class="form-group">
-        <label>Kategori Pengeluaran</label>
-        <select id="budgetCategory"></select>
+    <div class="search-panel" id="searchPanel">
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" id="musicSearch" placeholder="Cari lagu di YouTube..." autocomplete="off">
       </div>
-      <div class="form-group">
-        <label>Batas Anggaran (Rp)</label>
-        <div class="input-prefix"><span>Rp</span><input type="text" id="budgetAmount" placeholder="Contoh: 100.000" inputmode="numeric" autocomplete="off"></div>
-      </div>
-      <button class="btn" id="btnSaveBudget">Simpan Anggaran</button>
-      <div class="budget-list" id="budgetList"></div>
-    </section>
+      <div class="search-results" id="searchResults"><div class="search-empty">Ketik untuk mencari lagu</div></div>
+      <div id="ytPlayerContainer" style="position:absolute; width:0; height:0; overflow:hidden; opacity:0; pointer-events:none;"></div>
+    </div>
   </header>
 
   <div class="month-bar">
@@ -196,10 +258,38 @@
     </div>
   </section>
 
+  <section class="card" id="insightCard">
+    <div class="section-title">Ringkasan & Perbandingan</div>
+    <div class="insight-grid">
+      <div class="insight"><div class="insight-label">Pemasukan vs bulan lalu</div><div class="insight-value" id="incomeCompare">—</div><div class="insight-sub" id="incomeCompareSub">Belum ada data pembanding</div></div>
+      <div class="insight"><div class="insight-label">Pengeluaran vs bulan lalu</div><div class="insight-value" id="expenseCompare">—</div><div class="insight-sub" id="expenseCompareSub">Belum ada data pembanding</div></div>
+      <div class="insight"><div class="insight-label">Saldo bulan ini</div><div class="insight-value" id="netCompare">Rp 0</div><div class="insight-sub">Pemasukan dikurangi pengeluaran</div></div>
+      <div class="insight"><div class="insight-label">Kategori terbesar</div><div class="insight-value" id="largestCategory">Belum ada</div><div class="insight-sub" id="largestCategorySub">Catat pengeluaran untuk melihatnya</div></div>
+    </div>
+  </section>
+
   <section class="card" id="goalCard">
     <div class="section-title">🎯 Target Tabungan</div>
     <div id="goalContent"></div>
   </section>
+
+  <section class="card" id="budgetCard">
+    <div class="section-title">Anggaran per Kategori</div>
+    <p class="category-hint">Peringatan muncul saat pemakaian mencapai 80% dan ketika melewati batas.</p>
+    <div class="budget-form">
+      <select id="budgetCategory" aria-label="Kategori anggaran"></select>
+      <input type="text" id="budgetLimit" inputmode="numeric" placeholder="Batas Rp" aria-label="Batas anggaran">
+    </div>
+    <button class="btn" id="btnSetBudget">Simpan Anggaran</button>
+    <div id="budgetList"></div>
+  </section>
+
+  <div class="action-grid">
+    <button class="utility-btn" id="btnExportCsv">Ekspor transaksi CSV</button>
+    <button class="utility-btn" id="btnBackup">Backup data JSON</button>
+    <button class="utility-btn" id="btnRestore">Pulihkan backup JSON</button>
+    <input type="file" id="restoreFile" accept=".json,application/json" hidden>
+  </div>
 
   <section class="card">
     <div class="section-title">Tambah Transaksi</div>
@@ -220,8 +310,9 @@
       <input type="checkbox" id="chkSave">
       <label for="chkSave" class="so-text" style="cursor:pointer;margin:0;text-transform:none">
         <div class="so-title">💎 Sisihkan ke Target Tabungan</div>
-        <div class="so-desc">Uang langsung masuk tabungan, tidak bisa dipakai jajan.</div>
+        <div class="so-desc">Uang langsung masuk target yang dipilih.</div>
       </label>
+      <select id="savingGoalSelect" class="inline-select" aria-label="Pilih target tabungan"></select>
     </div>
     <div class="form-group">
       <label>Catatan (opsional)</label>
@@ -255,6 +346,63 @@
   </section>
 </div>
 
+<!-- MINI PLAYER -->
+<div class="mini-player" id="miniPlayer">
+  <img class="mp-cover" id="mpCover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='42' fill='%2326262b'/%3E" alt="cover">
+  <div class="mp-info"><div class="mp-title" id="mpTitle">Belum ada lagu</div><div class="mp-artist" id="mpArtist">-</div></div>
+  <div class="mp-controls" onclick="event.stopPropagation()">
+    <button class="mp-btn play-btn" id="mpPlayBtn"><svg id="mpPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+    <button class="mp-btn mp-close" id="mpClose">×</button>
+  </div>
+</div>
+
+<!-- FULL SCREEN PLAYER -->
+<div class="full-player" id="fullPlayer">
+  <div class="fp-header">
+    <svg id="fpClose" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+    <div class="fp-tag">Sedang Diputar<br><span style="font-size:0.6rem; color:var(--text-muted)">Audio Only · YouTube</span></div>
+    <div style="width:24px"></div>
+  </div>
+  
+  <img class="fp-cover" id="fpCover" src="" alt="Cover">
+  
+  <div class="fp-info">
+    <div>
+      <div class="fp-title" id="fpTitle">Judul Lagu</div>
+      <div class="fp-artist" id="fpArtist">Artis</div>
+    </div>
+    <svg class="fp-like" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+  </div>
+
+  <div class="fp-progress">
+    <div class="fp-bar" id="fpBar">
+      <div class="fp-bar-fill" id="fpBarFill"></div>
+    </div>
+    <div class="fp-time">
+      <span id="fpCurrentTime">0:00</span>
+      <span id="fpDuration">0:00</span>
+    </div>
+  </div>
+
+  <div class="fp-controls">
+    <button class="fp-btn" id="fpShuffle" title="Acak">
+      <svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+    </button>
+    <button class="fp-btn" id="fpPrev">
+      <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+    </button>
+    <button class="fp-btn-main" id="fpPlayBtn">
+      <svg id="fpPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <button class="fp-btn" id="fpNext">
+      <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+    </button>
+    <button class="fp-btn" id="fpRepeat" title="Ulangi">
+      <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+    </button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -274,17 +422,31 @@ const CATEGORIES = {
     { value: 'Lainnya', label: '📌 Lainnya', hint: 'Pengeluaran lain.', group: 'Umum' }
   ]
 };
-const CHART_COLORS = ['#a78bfa', '#7c3aed', '#c4b5fd', '#8b5cf6', '#6d28d9', '#ddd6fe'];
+const CHART_COLORS = ['#b8bbc2', '#858992', '#d0d2d7', '#686c75', '#9da1aa', '#e1e2e6'];
 
-let transactions = JSON.parse(localStorage.getItem('violet_finance_tx')) || [];
-let goal = JSON.parse(localStorage.getItem('violet_finance_goal')) || null;
+let transactions = safeParseLocal('violet_finance_tx', []);
+let legacyGoal = safeParseLocal('violet_finance_goal', null);
+let goals = safeParseLocal('violet_finance_goals_v1', null);
+if (!Array.isArray(goals)) {
+  goals = legacyGoal && typeof legacyGoal === 'object' ? [{ id: 'goal_legacy', name: String(legacyGoal.name || 'Target lama'), target: Number(legacyGoal.target) || 1, legacy: true }] : [];
+  localStorage.setItem('violet_finance_goals_v1', JSON.stringify(goals));
+}
+// Keep all historical savings assigned to the migrated legacy goal, without deleting old keys.
+transactions = Array.isArray(transactions) ? transactions : [];
+if (goals.some(g => g.id === 'goal_legacy')) {
+  transactions.forEach(t => { if (t && t.type === 'saving' && !t.goalId) t.goalId = 'goal_legacy'; });
+  localStorage.setItem('violet_finance_tx', JSON.stringify(transactions));
+}
+let budgets = safeParseLocal('violet_finance_budgets_v1', {});
+if (!budgets || typeof budgets !== 'object' || Array.isArray(budgets)) budgets = {};
 let currentType = 'expense', currentFilter = 'all', viewDate = new Date();
-
 const $ = (id) => document.getElementById(id);
-const fmtRupiah = (n) => 'Rp ' + Math.abs(Math.round(n)).toLocaleString('id-ID');
-const formatThousands = (str) => { const d = str.replace(/\D/g, ''); return d ? parseInt(d, 10).toLocaleString('id-ID') : ''; };
+const fmtRupiah = (n) => 'Rp ' + Math.abs(Math.round(Number(n) || 0)).toLocaleString('id-ID');
+const formatThousands = (str) => { const d = String(str).replace(/\D/g, ''); return d ? parseInt(d, 10).toLocaleString('id-ID') : ''; };
+function safeParseLocal(key, fallback) { try { const value = localStorage.getItem(key); return value ? JSON.parse(value) : fallback; } catch (_) { return fallback; } }
 const save = () => localStorage.setItem('violet_finance_tx', JSON.stringify(transactions));
-const saveGoal = () => localStorage.setItem('violet_finance_goal', JSON.stringify(goal));
+const saveGoals = () => { localStorage.setItem('violet_finance_goals_v1', JSON.stringify(goals)); localStorage.setItem('violet_finance_goal', JSON.stringify(goals.find(g => g.id === 'goal_legacy') || goals[0] || null)); };
+const saveBudgets = () => localStorage.setItem('violet_finance_budgets_v1', JSON.stringify(budgets));
 const escapeHtml = (str) => str.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const formatTime = (s) => { if(!s || isNaN(s)) return '0:00'; const m = Math.floor(s/60); const sec = Math.floor(s%60); return m + ':' + (sec<10?'0':'') + sec; };
 
@@ -304,9 +466,10 @@ function setType(type) {
   updateCategoryHint();
   if (type === 'income') {
     $('saveOption').style.display = 'flex';
-    $('saveOption').style.opacity = goal ? '1' : '0.5';
-    $('chkSave').disabled = !goal;
-    if (!goal) $('chkSave').checked = false;
+    $('saveOption').style.opacity = goals.length ? '1' : '0.5';
+    $('chkSave').disabled = !goals.length;
+    if (!goals.length) $('chkSave').checked = false;
+    renderGoalSelector();
   } else {
     $('saveOption').style.display = 'none';
     $('chkSave').checked = false;
@@ -322,18 +485,27 @@ function addTransaction() {
   const raw = $('amount').value.replace(/\./g, '');
   const amount = parseInt(raw, 10);
   const isSaving = currentType === 'income' && $('chkSave').checked;
-  if (!amount || amount <= 0) { showToast('⚠️ Masukkan jumlah valid'); return; }
-  if (isSaving && !goal) { showToast('⚠️ Buat target tabungan dulu'); return; }
+  const selectedGoal = goals.find(g => g.id === $('savingGoalSelect').value) || goals[0];
+  if (!amount || amount <= 0) { showToast('Masukkan jumlah yang valid'); return; }
+  if (isSaving && !selectedGoal) { showToast('Buat target tabungan dulu'); return; }
   const now = new Date();
   const txDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+  const txCategory = isSaving ? 'Tabungan' : $('category').value;
+  const priorCategorySpend = currentType === 'expense' ? monthTransactions().filter(t => t.type === 'expense' && t.category === txCategory).reduce((sum,t) => sum + (Number(t.amount)||0), 0) : 0;
   transactions.unshift({
     id: Date.now(), type: isSaving ? 'saving' : currentType, amount,
-    category: isSaving ? 'Tabungan' : $('category').value,
-    note: isSaving ? goal.name : $('note').value.trim(), date: txDate.toISOString()
+    category: txCategory, goalId: isSaving ? selectedGoal.id : undefined,
+    note: isSaving ? selectedGoal.name : $('note').value.trim(), date: txDate.toISOString()
   });
   save(); renderAll();
   $('amount').value = ''; $('note').value = ''; $('chkSave').checked = false;
-  showToast(isSaving ? '💎 Masuk tabungan!' : (currentType === 'income' ? '✅ Pemasukan dicatat!' : '✅ Pengeluaran dicatat!'));
+  let message = isSaving ? 'Tabungan berhasil dicatat' : (currentType === 'income' ? 'Pemasukan dicatat' : 'Pengeluaran dicatat');
+  if (currentType === 'expense' && Number(budgets[txCategory]) > 0) {
+    const afterSpend = priorCategorySpend + amount, limit = Number(budgets[txCategory]);
+    if (afterSpend >= limit) message = `Peringatan: anggaran ${txCategory} terlampaui atau sudah mencapai batas`;
+    else if (priorCategorySpend < limit * .8 && afterSpend >= limit * .8) message = `Peringatan: anggaran ${txCategory} sudah terpakai 80%`;
+  }
+  showToast(message);
 }
 function deleteTransaction(id) {
   if (!confirm('Hapus transaksi ini?')) return;
@@ -438,37 +610,133 @@ function renderChart() {
   }).join('');
 }
 
+function goalSavedAmount(goalId) {
+  return transactions.filter(t => t.type === 'saving' && (t.goalId || (goals.some(g => g.id === 'goal_legacy') ? 'goal_legacy' : goals[0]?.id)) === goalId).reduce((sum,t) => sum + (Number(t.amount)||0), 0);
+}
+function renderGoalSelector() {
+  const select = $('savingGoalSelect');
+  if (!select) return;
+  const previous = select.value;
+  select.innerHTML = goals.map(g => `<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)}</option>`).join('');
+  if (goals.some(g => g.id === previous)) select.value = previous;
+  select.style.display = goals.length ? 'block' : 'none';
+}
 function renderGoal() {
-  if (!goal) {
-    $('goalContent').innerHTML = `
-      <div class="goal-empty"><span class="emoji">🎯</span>Belum ada target.<br>Buat target, lalu sisihkan uangmu!</div>
-      <div class="goal-form">
-        <input type="text" id="goalName" placeholder="Nama target (contoh: Beli HP)" style="margin-bottom:10px" maxlength="40">
-        <div class="input-prefix" style="margin-bottom:10px"><span>Rp</span><input type="text" id="goalTarget" placeholder="0" inputmode="numeric"></div>
-        <button class="btn btn-amber" id="btnSetGoal">Buat Target</button>
-      </div>`;
-    $('goalTarget').addEventListener('input', e => e.target.value = formatThousands(e.target.value));
-    $('btnSetGoal').addEventListener('click', () => {
-      const name = $('goalName').value.trim(), target = parseInt($('goalTarget').value.replace(/\./g, ''), 10);
-      if (!name || !target) return showToast('⚠️ Isi nama & target');
-      goal = { name, target }; saveGoal(); setType(currentType); renderGoal(); showToast('🎯 Target dibuat!');
-    });
-    return;
+  const content = $('goalContent');
+  if (!goals.length) {
+    content.innerHTML = `<div class="empty-inline">Belum ada target tabungan. Buat target pertama di bawah.</div>`;
+  } else {
+    content.innerHTML = `<div class="goal-list">${goals.map(g => {
+      const saved = goalSavedAmount(g.id), target = Math.max(1, Number(g.target)||1);
+      const pct = Math.min(100, saved/target*100), done = saved >= target;
+      return `<div class="goal-item"><div class="goal-header"><span class="goal-name">${escapeHtml(g.name)}</span><span class="goal-target">Target ${fmtRupiah(target)}</span></div>
+        <div class="progress-track"><div class="progress-fill ${done?'done':''}" style="width:${pct}%"></div></div>
+        <div class="goal-footer"><span>Terkumpul <strong class="amber">${fmtRupiah(saved)}</strong></span><span>${pct.toFixed(0)}%</span></div>
+        <div class="goal-footer" style="margin-top:6px"><span>${done ? '<strong>Target tercapai</strong>' : `Sisa <strong>${fmtRupiah(target-saved)}</strong>`}</span></div>
+        <div class="goal-actions"><button class="btn btn-ghost" onclick="editGoal('${escapeHtml(g.id)}')">Ubah</button><button class="btn btn-ghost" style="color:var(--red)" onclick="deleteGoal('${escapeHtml(g.id)}')">Hapus</button></div></div>`;
+    }).join('')}</div>`;
   }
-  const saved = transactions.filter(t => t.type === 'saving').reduce((a,b) => a+b.amount, 0);
-  const pct = Math.min(100, (saved/goal.target)*100);
-  const done = saved >= goal.target;
-  $('goalContent').innerHTML = `
-    <div class="goal-header"><span class="goal-name">${escapeHtml(goal.name)}</span><span class="goal-target">Target ${fmtRupiah(goal.target)}</span></div>
-    <div class="progress-track"><div class="progress-fill ${done ? 'done' : ''}" style="width:${pct}%"></div></div>
-    <div class="goal-footer"><span>Terkumpul <strong class="amber">${fmtRupiah(saved)}</strong></span><span>${pct.toFixed(0)}%</span></div>
-    ${done ? '<div class="goal-done-badge">🎉 Target tercapai!</div>' : `<div class="goal-footer" style="margin-top:6px"><span>Sisa <strong>${fmtRupiah(goal.target-saved)}</strong></span></div>`}
-    <div class="goal-actions"><button class="btn btn-ghost" id="btnEditGoal">✏️ Ganti</button><button class="btn btn-ghost" id="btnResetGoal" style="color:var(--red)">🗑️ Hapus</button></div>`;
-  $('btnEditGoal').addEventListener('click', () => { goal = null; saveGoal(); setType(currentType); renderGoal(); });
-  $('btnResetGoal').addEventListener('click', () => { if(confirm('Hapus target?')) { goal = null; saveGoal(); setType(currentType); renderGoal(); } });
+  content.insertAdjacentHTML('beforeend', `<div class="goal-form"><input type="text" id="goalName" placeholder="Nama target, mis. Beli HP" maxlength="40" style="margin-bottom:10px"><div class="input-prefix" style="margin-bottom:10px"><span>Rp</span><input type="text" id="goalTarget" placeholder="Jumlah target" inputmode="numeric"></div><button class="btn btn-amber" id="btnSetGoal">Tambah Target</button></div>`);
+  $('goalTarget').addEventListener('input', e => e.target.value = formatThousands(e.target.value));
+  $('btnSetGoal').addEventListener('click', () => {
+    const name = $('goalName').value.trim(), target = parseInt($('goalTarget').value.replace(/\./g,''),10);
+    if (!name || !Number.isFinite(target) || target <= 0) return showToast('Isi nama dan nominal target yang valid');
+    goals.push({ id: 'goal_' + Date.now() + '_' + Math.random().toString(36).slice(2,7), name, target });
+    saveGoals(); renderAll(); setType(currentType); showToast('Target tabungan ditambahkan');
+  });
+}
+function editGoal(id) {
+  const g = goals.find(x => x.id === id); if (!g) return;
+  const name = prompt('Nama target:', g.name); if (name === null) return;
+  const targetText = prompt('Nominal target (angka rupiah):', String(g.target)); if (targetText === null) return;
+  const target = Number(targetText.replace(/[^0-9]/g,''));
+  if (!name.trim() || !Number.isFinite(target) || target <= 0) return showToast('Nama atau nominal target tidak valid');
+  g.name = name.trim(); g.target = target; saveGoals(); renderAll(); setType(currentType);
+}
+function deleteGoal(id) {
+  const g = goals.find(x => x.id === id); if (!g) return;
+  if (transactions.some(t => t.type === 'saving' && t.goalId === id) && !confirm('Target ini memiliki transaksi tabungan. Hapus target saja? Riwayat tabungan tetap disimpan dan tidak lagi dihitung ke target lain.')) return;
+  if (!confirm(`Hapus target "${g.name}"?`)) return;
+  goals = goals.filter(x => x.id !== id); saveGoals(); renderAll(); setType(currentType); showToast('Target dihapus');
+}
+function totalsFor(list) {
+  return list.reduce((a,t) => { if(t.type==='income') a.income += Number(t.amount)||0; else if(t.type==='expense') a.expense += Number(t.amount)||0; else if(t.type==='saving') a.saving += Number(t.amount)||0; return a; }, {income:0,expense:0,saving:0});
+}
+function renderInsights() {
+  const current = totalsFor(monthTransactions());
+  const prevDate = new Date(viewDate.getFullYear(), viewDate.getMonth()-1, 1);
+  const prev = totalsFor(transactions.filter(t => isSameMonth(t.date, prevDate)));
+  const showDelta = (id, subId, now, before) => {
+    const diff = now-before, pct = before ? (diff/ before*100) : null;
+    $(id).textContent = (diff > 0 ? '+' : diff < 0 ? '−' : '') + fmtRupiah(diff);
+    $(subId).textContent = before ? `${pct > 0 ? '+' : ''}${pct.toFixed(1)}% dibanding bulan lalu` : 'Belum ada transaksi bulan lalu';
+  };
+  showDelta('incomeCompare','incomeCompareSub',current.income,prev.income);
+  showDelta('expenseCompare','expenseCompareSub',current.expense,prev.expense);
+  $('netCompare').textContent = fmtRupiah(current.income-current.expense);
+  const group = {};
+  monthTransactions().filter(t=>t.type==='expense').forEach(t => group[t.category] = (group[t.category]||0)+(Number(t.amount)||0));
+  const top = Object.entries(group).sort((a,b)=>b[1]-a[1])[0];
+  const category = top && CATEGORIES.expense.find(c=>c.value===top[0]);
+  $('largestCategory').textContent = top ? (category ? category.label.replace(/^[^\s]+\s/,'') : top[0]) : 'Belum ada';
+  $('largestCategorySub').textContent = top ? fmtRupiah(top[1]) + ' bulan ini' : 'Catat pengeluaran untuk melihatnya';
+}
+function renderBudgets() {
+  const sel = $('budgetCategory');
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = CATEGORIES.expense.map(c=>`<option value="${escapeHtml(c.value)}">${escapeHtml(c.label)}</option>`).join('');
+  if (CATEGORIES.expense.some(c=>c.value===prev)) sel.value=prev;
+  const exp = monthTransactions().filter(t=>t.type==='expense');
+  const active = Object.entries(budgets).filter(([cat,limit])=>Number(limit)>0 && CATEGORIES.expense.some(c=>c.value===cat));
+  $('budgetList').innerHTML = active.length ? active.map(([cat,limit])=>{
+    const spent=exp.filter(t=>t.category===cat).reduce((a,t)=>a+(Number(t.amount)||0),0), pct=spent/Number(limit)*100;
+    const cls=pct>=100?'over':pct>=80?'warn':'';
+    const label=CATEGORIES.expense.find(c=>c.value===cat)?.label || cat;
+    const notice=pct>=100?'Batas terlampaui':pct>=80?'Anggaran hampir habis':'';
+    return `<div class="budget-row"><div class="budget-row-head"><strong>${escapeHtml(label)}</strong><div class="budget-row-actions"><button class="small-action" onclick="editBudget('${escapeHtml(cat)}')">Ubah</button><button class="small-action" onclick="removeBudget('${escapeHtml(cat)}')">Hapus</button></div></div><div class="budget-track"><div class="budget-fill ${cls}" style="width:${Math.min(100,pct)}%"></div></div><div class="budget-row-meta"><span>${fmtRupiah(spent)} / ${fmtRupiah(limit)}</span><strong>${pct.toFixed(0)}%</strong></div>${notice?`<div class="notice">${notice} untuk ${escapeHtml(label)}.</div>`:''}</div>`;
+  }).join('') : '<div class="empty-inline">Belum ada batas anggaran. Pilih kategori dan masukkan batasnya.</div>';
+}
+function editBudget(cat) {
+  const current = budgets[cat]; const value = prompt(`Batas anggaran untuk ${cat} (rupiah):`, String(current));
+  if (value===null) return; const amount=Number(value.replace(/[^0-9]/g,''));
+  if (!Number.isFinite(amount)||amount<=0) return showToast('Nominal anggaran tidak valid');
+  budgets[cat]=amount; saveBudgets(); renderBudgets(); showToast('Anggaran diperbarui');
+}
+function removeBudget(cat) { if(!confirm(`Hapus anggaran ${cat}?`)) return; delete budgets[cat]; saveBudgets(); renderBudgets(); }
+function exportCsv() {
+  const rows=[['ID','Tanggal','Jenis','Kategori','Catatan','Nominal','Target Tabungan ID'], ...transactions.map(t=>[t.id,t.date,t.type,t.category,t.note||'',t.amount,t.goalId||''])];
+  const csv='\uFEFF'+rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  downloadBlob(csv,`violet-transaksi-${new Date().toISOString().slice(0,10)}.csv`,'text/csv;charset=utf-8');
+}
+function backupData() {
+  const payload={ app:'Violet Finance', schemaVersion:2, exportedAt:new Date().toISOString(), transactions, goals, budgets };
+  downloadBlob(JSON.stringify(payload,null,2),`violet-backup-${new Date().toISOString().slice(0,10)}.json`,'application/json');
+}
+function downloadBlob(content,filename,type) {
+  const blob=new Blob([content],{type}), url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function restoreBackup(file) {
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try {
+      const data=JSON.parse(reader.result);
+      if(!data || data.app!=='Violet Finance' || !Array.isArray(data.transactions) || !Array.isArray(data.goals) || !data.budgets || typeof data.budgets!=='object' || Array.isArray(data.budgets)) throw new Error('Format backup tidak dikenali.');
+      const validTx=data.transactions.every(t=>t && (typeof t.id==='string'||typeof t.id==='number') && ['income','expense','saving'].includes(t.type) && Number.isFinite(Number(t.amount)) && Number(t.amount)>0 && typeof t.date==='string' && !Number.isNaN(Date.parse(t.date)) && typeof t.category==='string');
+      const validGoals=data.goals.every(g=>g && typeof g.id==='string' && typeof g.name==='string' && g.name.trim() && Number.isFinite(Number(g.target)) && Number(g.target)>0);
+      const validBudgets=Object.entries(data.budgets).every(([k,v])=>typeof k==='string' && Number.isFinite(Number(v)) && Number(v)>0);
+      if(!validTx || !validGoals || !validBudgets) throw new Error('Ada data yang tidak valid. Data aktif tidak diubah.');
+      if(!confirm(`Pulihkan ${data.transactions.length} transaksi, ${data.goals.length} target, dan ${Object.keys(data.budgets).length} anggaran? Data lokal saat ini akan diganti.`)) return;
+      transactions=data.transactions; goals=data.goals; budgets=data.budgets;
+      save(); saveGoals(); saveBudgets(); renderAll(); setType(currentType); showToast('Backup berhasil dipulihkan');
+    } catch(err) { showToast(err.message || 'File backup tidak bisa dibaca'); }
+    $('restoreFile').value='';
+  };
+  reader.onerror=()=>showToast('File gagal dibaca'); reader.readAsText(file);
 }
 
-function renderAll() { renderBalance(); renderGoal(); renderChart(); renderTransactions(); renderSummary(); if ($('budgetPanel').style.display !== 'none') renderBudgets(); }
+function renderAll() { renderBalance(); renderInsights(); renderGoal(); renderGoalSelector(); renderBudgets(); renderChart(); renderTransactions(); renderSummary(); }
 
 $('amount').addEventListener('input', e => e.target.value = formatThousands(e.target.value));
 $('btnIncome').addEventListener('click', () => setType('income'));
@@ -476,6 +744,12 @@ $('btnExpense').addEventListener('click', () => setType('expense'));
 $('category').addEventListener('change', updateCategoryHint);
 $('btnSave').addEventListener('click', addTransaction);
 $('btnClear').addEventListener('click', clearAll);
+$('btnSetBudget').addEventListener('click', () => { const cat=$('budgetCategory').value, amount=Number($('budgetLimit').value.replace(/\./g,'')); if(!cat || !Number.isFinite(amount) || amount<=0) return showToast('Masukkan batas anggaran yang valid'); budgets[cat]=amount; saveBudgets(); $('budgetLimit').value=''; renderBudgets(); showToast('Anggaran disimpan'); });
+$('budgetLimit').addEventListener('input', e => e.target.value=formatThousands(e.target.value));
+$('btnExportCsv').addEventListener('click', exportCsv);
+$('btnBackup').addEventListener('click', backupData);
+$('btnRestore').addEventListener('click', () => $('restoreFile').click());
+$('restoreFile').addEventListener('change', e => { if(e.target.files && e.target.files[0]) restoreBackup(e.target.files[0]); });
 document.querySelectorAll('.filter-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     currentFilter = tab.dataset.filter;
@@ -487,82 +761,184 @@ $('prevMonth').addEventListener('click', () => { viewDate.setMonth(viewDate.getM
 $('nextMonth').addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth()+1); viewDate = new Date(viewDate); renderAll(); });
 
 
-/* ===== ANGGARAN BULANAN ===== */
-let budgets = JSON.parse(localStorage.getItem('violet_finance_budgets')) || {};
+/* ===== AUDIO PLAYER & TRIK BACKGROUND ===== */
+let ytPlayer = null, ytReady = false, isPlaying = false;
+let playlist = [], currentIndex = -1, isShuffle = false, isRepeat = false;
+let progressInterval = null;
 
-function saveBudgets() {
-  localStorage.setItem('violet_finance_budgets', JSON.stringify(budgets));
+function loadYouTubeAPI() {
+  if (window.YT && window.YT.Player) { onYouTubeIframeAPIReady(); return; }
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+  window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
 }
 
-function getBudgetSpent(category) {
-  return monthTransactions()
-    .filter(t => t.type === 'expense' && t.category === category)
-    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-}
-
-function renderBudgets() {
-  $('budgetMonthLabel').textContent = viewDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
-  const select = $('budgetCategory');
-  const current = select.value;
-  select.innerHTML = CATEGORIES.expense.map(c => `<option value="${c.value}">${c.label}</option>`).join('');
-  if (CATEGORIES.expense.some(c => c.value === current)) select.value = current;
-
-  const entries = Object.entries(budgets)
-    .filter(([category, amount]) => CATEGORIES.expense.some(c => c.value === category) && Number(amount) > 0)
-    .sort((a, b) => getBudgetSpent(b[0]) / Number(b[1]) - getBudgetSpent(a[0]) / Number(a[1]));
-
-  if (!entries.length) {
-    $('budgetList').innerHTML = '<div class="budget-empty">Belum ada anggaran. Atur batas untuk kategori yang ingin lu pantau.</div>';
-    return;
-  }
-
-  $('budgetList').innerHTML = entries.map(([category, limit]) => {
-    const item = CATEGORIES.expense.find(c => c.value === category);
-    const spent = getBudgetSpent(category);
-    const pct = spent / Number(limit) * 100;
-    const width = Math.min(100, pct);
-    const statusClass = pct >= 100 ? 'over' : pct >= 80 ? 'warn' : '';
-    const statusText = pct >= 100 ? 'Melewati batas' : pct >= 80 ? 'Hampir habis' : 'Aman';
-    const remaining = Number(limit) - spent;
-    const remainingText = remaining >= 0 ? 'Sisa ' + fmtRupiah(remaining) : 'Lebih ' + fmtRupiah(Math.abs(remaining));
-    return `<div class="budget-item">
-      <div class="budget-item-head"><span>${item ? item.label : escapeHtml(category)}</span><span class="budget-status ${statusClass}">${statusText}</span></div>
-      <div class="budget-track"><div class="budget-fill ${statusClass}" style="width:${width}%"></div></div>
-      <div class="budget-item-foot"><span>${fmtRupiah(spent)} / ${fmtRupiah(Number(limit))}</span><span>${remainingText} <button class="budget-delete" data-category="${escapeHtml(category)}" title="Hapus anggaran" aria-label="Hapus anggaran ${escapeHtml(category)}">×</button></span></div>
-    </div>`;
-  }).join('');
-
-  document.querySelectorAll('.budget-delete').forEach(button => {
-    button.addEventListener('click', () => {
-      delete budgets[button.dataset.category];
-      saveBudgets();
-      renderBudgets();
-      showToast('Anggaran dihapus');
-    });
+function onYouTubeIframeAPIReady() {
+  ytPlayer = new YT.Player('ytPlayerContainer', {
+    height: '0', width: '0', videoId: '',
+    playerVars: { autoplay: 0, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, rel: 0, iv_load_policy: 3 },
+    events: {
+      onReady: () => ytReady = true,
+      onStateChange: (e) => {
+        if (e.data === 1) { isPlaying = true; updatePlayIcons(); startProgress(); }
+        else if (e.data === 2 || e.data === 0) { 
+          isPlaying = false; updatePlayIcons(); stopProgress();
+          if (e.data === 0) handleTrackEnd(); 
+        }
+      }
+    }
   });
 }
 
-$('budgetTrigger').addEventListener('click', () => {
-  const panel = $('budgetPanel');
-  const open = panel.style.display === 'none';
-  panel.style.display = open ? 'block' : 'none';
-  $('budgetTrigger').setAttribute('aria-expanded', String(open));
-  if (open) renderBudgets();
+$('audioTrigger').addEventListener('click', () => {
+  $('searchPanel').classList.toggle('show');
+  if ($('searchPanel').classList.contains('show')) { $('musicSearch').focus(); if (!ytPlayer) loadYouTubeAPI(); }
 });
 
-$('budgetAmount').addEventListener('input', e => e.target.value = formatThousands(e.target.value));
-$('btnSaveBudget').addEventListener('click', () => {
-  const category = $('budgetCategory').value;
-  const amount = parseInt($('budgetAmount').value.replace(/\./g, ''), 10);
-  if (!category || !Number.isFinite(amount) || amount <= 0) {
-    showToast('Masukkan batas anggaran yang valid');
-    return;
+let searchTimeout;
+$('musicSearch').addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  const q = $('musicSearch').value.trim();
+  if (!q) { $('searchResults').innerHTML = '<div class="search-empty">Ketik untuk mencari lagu</div>'; return; }
+  $('searchResults').innerHTML = '<div class="search-loading">Mencari...</div>';
+  searchTimeout = setTimeout(async () => {
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      if (!data.videos || !data.videos.length) { $('searchResults').innerHTML = '<div class="search-empty">Lagu tidak ditemukan</div>'; return; }
+      
+      playlist = data.videos;
+      $('searchResults').innerHTML = data.videos.map((v, i) => `
+        <div class="search-item" onclick="playTrack(${i})">
+          <img src="${v.thumbnail}" loading="lazy">
+          <div class="search-item-info"><div class="search-item-title">${escapeHtml(v.title)}</div><div class="search-item-artist">${escapeHtml(v.channel)}</div></div>
+        </div>`).join('');
+    } catch(e) { $('searchResults').innerHTML = '<div class="search-empty">Error server</div>'; }
+  }, 600);
+});
+
+function playTrack(index) {
+  if (!ytReady) return showToast('⏳ Player loading...');
+  currentIndex = index;
+  const track = playlist[index];
+  
+  $('mpCover').src = track.thumbnail; $('mpTitle').textContent = track.title; $('mpArtist').textContent = track.channel;
+  $('fpCover').src = track.thumbnail; $('fpTitle').textContent = track.title; $('fpArtist').textContent = track.channel;
+  
+  $('miniPlayer').classList.add('show');
+  ytPlayer.loadVideoById(track.videoId); 
+  ytPlayer.unMute(); 
+  ytPlayer.setVolume(80);
+  
+  // === TRIK AGAR TETAP JALAN DI BACKGROUND ===
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = "playing";
   }
-  budgets[category] = amount;
-  saveBudgets();
-  $('budgetAmount').value = '';
-  renderBudgets();
-  showToast('Anggaran berhasil disimpan');
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    gainNode.gain.value = 0;
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    osc.start();
+    setTimeout(() => { osc.stop(); }, 1000); 
+  } catch(e) {}
+  // ============================================
+
+  isPlaying = true; updatePlayIcons(); startProgress();
+  
+  // NOTIFIKASI HP (MEDIA SESSION API)
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title,
+      artist: track.channel,
+      album: 'Violet Finance',
+      artwork: [{ src: track.thumbnail, sizes: '512x512', type: 'image/jpeg' }]
+    });
+    navigator.mediaSession.setActionHandler('play', () => ytPlayer.playVideo());
+    navigator.mediaSession.setActionHandler('pause', () => ytPlayer.pauseVideo());
+    navigator.mediaSession.setActionHandler('previoustrack', () => playPrev());
+    navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
+  }
+  showToast('🎵 Memutar...');
+}
+
+function updatePlayIcons() {
+  const icon = isPlaying ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
+  $('mpPlayIcon').innerHTML = icon;
+  $('fpPlayIcon').innerHTML = icon;
+}
+
+function handleTrackEnd() {
+  if (isRepeat) { playTrack(currentIndex); return; }
+  playNext();
+}
+
+function playNext() {
+  if (!playlist.length) return;
+  if (isShuffle) { playTrack(Math.floor(Math.random() * playlist.length)); return; }
+  let next = currentIndex + 1;
+  if (next >= playlist.length) next = 0;
+  playTrack(next);
+}
+
+function playPrev() {
+  if (!playlist.length) return;
+  let prev = currentIndex - 1;
+  if (prev < 0) prev = playlist.length - 1;
+  playTrack(prev);
+}
+
+// Kontrol Mini Player & Full Player
+$('mpPlayBtn').addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
+$('mpClose').addEventListener('click', (e) => { 
+  e.stopPropagation(); ytPlayer.stopVideo(); 
+  $('miniPlayer').classList.remove('show'); $('fullPlayer').classList.remove('show'); 
+  isPlaying = false; updatePlayIcons(); stopProgress();
+});
+$('miniPlayer').addEventListener('click', () => { $('fullPlayer').classList.add('show'); });
+$('fpClose').addEventListener('click', () => { $('fullPlayer').classList.remove('show'); });
+$('fpPlayBtn').addEventListener('click', togglePlay);
+$('fpNext').addEventListener('click', playNext);
+$('fpPrev').addEventListener('click', playPrev);
+
+$('fpShuffle').addEventListener('click', function() { 
+  isShuffle = !isShuffle; this.classList.toggle('active', isShuffle); 
+  showToast(isShuffle ? '🔀 Acak: Nyala' : '🔀 Acak: Mati');
+});
+$('fpRepeat').addEventListener('click', function() { 
+  isRepeat = !isRepeat; this.classList.toggle('active', isRepeat); 
+  showToast(isRepeat ? '🔁 Ulangi: Nyala' : '🔁 Ulangi: Mati');
+});
+
+function togglePlay() {
+  if (!ytPlayer || !playlist.length) return;
+  if (isPlaying) ytPlayer.pauseVideo(); else ytPlayer.playVideo();
+}
+
+// Progress Bar
+function startProgress() {
+  stopProgress();
+  progressInterval = setInterval(() => {
+    if (!ytPlayer || !ytPlayer.getDuration) return;
+    const cur = ytPlayer.getCurrentTime();
+    const dur = ytPlayer.getDuration();
+    if (dur > 0) {
+      $('fpBarFill').style.width = (cur / dur * 100) + '%';
+      $('fpCurrentTime').textContent = formatTime(cur);
+      $('fpDuration').textContent = formatTime(dur);
+    }
+  }, 1000);
+}
+function stopProgress() { clearInterval(progressInterval); }
+
+$('fpBar').addEventListener('click', (e) => {
+  if (!ytPlayer || !ytPlayer.getDuration) return;
+  const rect = $('fpBar').getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  ytPlayer.seekTo(pct * ytPlayer.getDuration(), true);
 });
 
 /* ===== INIT ===== */
