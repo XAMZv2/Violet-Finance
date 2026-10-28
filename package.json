@@ -1,7 +1,5 @@
 {
   "name": "violet-finance",
-  "version": "1.0.0",
-  "dependencies": {
-    "youtube-search-api": "^1.2.1"
-  }
+  "version": "1.0.0"
 }
+
