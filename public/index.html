@@ -2,13 +2,13 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Violet Finance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
     --bg: #0a0a0b; --bg-card: #141416; --bg-input: #1c1c20; --border: #26262b;
     --border-focus: #4a4a52; --text: #f0f0f2; --text-secondary: #9a9aa3;
@@ -16,10 +16,10 @@
     --green: #4ade80; --green-bg: #14291c; --red: #f87171; --red-bg: #2a1618;
     --amber: #fbbf24; --amber-bg: #2a2114;
   }
-  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); min-height: 100vh; padding: 16px; padding-bottom: 100px; -webkit-font-smoothing: antialiased; }
+  body { background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); min-height: 100vh; padding: 16px; padding-bottom: 100px; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   .container { max-width: 480px; margin: 0 auto; }
   
-  /* Header & Audio */
+  /* Header action & budget panel */
   header { padding: 20px 4px; }
   .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .brand { display: flex; align-items: center; gap: 12px; }
@@ -27,41 +27,27 @@
   .brand-text h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px; }
   .brand-text p { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
   .audio-trigger { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
-  .audio-trigger:hover { color: var(--text); border-color: var(--border-focus); }
-  .audio-trigger svg { width: 18px; height: 18px; fill: currentColor; }
-
-  .search-panel { display: none; margin-top: 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; animation: slideDown 0.2s ease-out; }
-  .search-panel.show { display: block; }
-  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-  .search-input-wrap { position: relative; display: flex; align-items: center; margin-bottom: 12px; }
-  .search-input-wrap svg { position: absolute; left: 12px; width: 16px; height: 16px; fill: var(--text-muted); pointer-events: none; }
-  .search-input-wrap input { width: 100%; padding: 10px 10px 10px 36px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 0.85rem; font-family: inherit; outline: none; }
-  .search-input-wrap input:focus { border-color: var(--border-focus); }
-  .search-results { max-height: 220px; overflow-y: auto; margin-right: -4px; padding-right: 4px; display: flex; flex-direction: column; gap: 8px; }
-  .search-results::-webkit-scrollbar { width: 4px; }
-  .search-results::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-  .search-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 10px; cursor: pointer; transition: background 0.2s; }
-  .search-item:hover { background: var(--bg-input); }
-  .search-item img { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; }
-  .search-item-info { flex: 1; min-width: 0; }
-  .search-item-title { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .search-item-artist { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-  .search-loading, .search-empty { text-align: center; font-size: 0.8rem; color: var(--text-muted); padding: 10px; }
-
-  .mini-player { position: fixed; bottom: 16px; left: 16px; right: 16px; max-width: 448px; margin: 0 auto; background: rgba(20, 20, 22, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 16px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); transform: translateY(120px); transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 1000; }
-  .mini-player.show { transform: translateY(0); }
-  .mp-cover { width: 42px; height: 42px; border-radius: 8px; object-fit: cover; background: var(--bg-input); }
-  .mp-info { flex: 1; min-width: 0; }
-  .mp-title { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .mp-artist { font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-  .mp-controls { display: flex; align-items: center; gap: 8px; }
-  .mp-btn { background: none; border: none; color: var(--text); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
-  .mp-btn:hover { background: var(--bg-input); }
-  .mp-btn.play-btn { background: var(--accent); color: white; }
-  .mp-btn.play-btn:hover { background: var(--accent-dim); }
-  .mp-btn svg { width: 18px; height: 18px; fill: currentColor; }
-  .mp-close { font-size: 1.2rem; color: var(--text-muted); line-height: 1; }
-  .mp-close:hover { color: var(--red); background: transparent; }
+  .audio-trigger:hover, .audio-trigger[aria-expanded="true"] { color: var(--accent); border-color: var(--accent-dim); }
+  .audio-trigger svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  .budget-panel { animation: slideDown 0.2s ease-out; }
+  .budget-help { color: var(--text-secondary); font-size: 0.78rem; line-height: 1.5; margin: -4px 0 16px; }
+  .budget-list { margin-top: 18px; }
+  .budget-empty { color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 16px 0 4px; }
+  .budget-item { padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .budget-item:last-child { border-bottom: 0; }
+  .budget-item-head, .budget-item-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .budget-item-head { font-size: 0.82rem; font-weight: 700; margin-bottom: 8px; }
+  .budget-status { font-size: 0.68rem; font-weight: 700; border-radius: 6px; padding: 4px 7px; background: var(--green-bg); color: var(--green); white-space: nowrap; }
+  .budget-status.warn { background: var(--amber-bg); color: var(--amber); }
+  .budget-status.over { background: var(--red-bg); color: var(--red); }
+  .budget-track { height: 8px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
+  .budget-fill { height: 100%; border-radius: 8px; background: var(--green); transition: width .25s; }
+  .budget-fill.warn { background: var(--amber); }
+  .budget-fill.over { background: var(--red); }
+  .budget-item-foot { color: var(--text-secondary); font-size: 0.72rem; }
+  .budget-delete { border: 0; background: transparent; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; padding: 2px 5px; }
+  .budget-delete:hover { color: var(--red); }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
 
   /* UI Keuangan */
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 20px; margin-bottom: 14px; }
@@ -158,7 +144,7 @@
   .btn-ghost { background: var(--bg-input); color: var(--text-secondary); border: 1px solid var(--border); box-shadow: none; }
   .info-note { font-size: 0.72rem; color: var(--text-muted); margin-top: 10px; line-height: 1.5; padding: 10px 12px; background: var(--bg-input); border-radius: 10px; }
   .clear-btn { background: none; border: none; color: var(--red); font-size: 0.75rem; cursor: pointer; font-weight: 600; opacity: 0.8; }
-  .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: #222226; border: 1px solid var(--border); color: var(--text); padding: 12px 22px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; transition: transform 0.35s; z-index: 2000; box-shadow: 0 8px 32px rgba(0,0,0,0.5); white-space: nowrap; }
+  .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: #222226; border: 1px solid var(--border); color: var(--text); padding: 12px 22px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; transition: transform 0.35s; z-index: 3000; box-shadow: 0 8px 32px rgba(0,0,0,0.5); white-space: nowrap; }
   .toast.show { transform: translateX(-50%) translateY(0); }
 </style>
 </head>
@@ -173,19 +159,25 @@
           <p>Kelola uangmu, raih mimpimu</p>
         </div>
       </div>
-      <button class="audio-trigger" id="audioTrigger" title="Cari & Putar Lagu">
-        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+      <button class="audio-trigger" id="budgetTrigger" title="Anggaran Bulanan" aria-expanded="false">
+        <svg viewBox="0 0 24 24"><path d="M3 5h18v14H3z" stroke="currentColor" stroke-width="2"/><path d="M7 9h4M7 13h10M7 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
     </div>
     
-    <div class="search-panel" id="searchPanel">
-      <div class="search-input-wrap">
-        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        <input type="text" id="musicSearch" placeholder="Cari lagu di YouTube..." autocomplete="off">
+    <section class="card budget-panel" id="budgetPanel" style="display:none">
+      <div class="section-title">Anggaran Bulanan <span id="budgetMonthLabel"></span></div>
+      <p class="budget-help">Atur batas pengeluaran per kategori. Pemakaian dihitung dari transaksi di bulan yang sedang dipilih.</p>
+      <div class="form-group">
+        <label>Kategori Pengeluaran</label>
+        <select id="budgetCategory"></select>
       </div>
-      <div class="search-results" id="searchResults"><div class="search-empty">Ketik untuk mencari lagu</div></div>
-      <div id="ytPlayerContainer" style="position:absolute; width:0; height:0; overflow:hidden; opacity:0; pointer-events:none;"></div>
-    </div>
+      <div class="form-group">
+        <label>Batas Anggaran (Rp)</label>
+        <div class="input-prefix"><span>Rp</span><input type="text" id="budgetAmount" placeholder="Contoh: 100.000" inputmode="numeric" autocomplete="off"></div>
+      </div>
+      <button class="btn" id="btnSaveBudget">Simpan Anggaran</button>
+      <div class="budget-list" id="budgetList"></div>
+    </section>
   </header>
 
   <div class="month-bar">
@@ -263,19 +255,10 @@
   </section>
 </div>
 
-<div class="mini-player" id="miniPlayer">
-  <img class="mp-cover" id="mpCover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='42' fill='%2326262b'/%3E" alt="cover">
-  <div class="mp-info"><div class="mp-title" id="mpTitle">Belum ada lagu</div><div class="mp-artist" id="mpArtist">-</div></div>
-  <div class="mp-controls">
-    <button class="mp-btn play-btn" id="mpPlayBtn"><svg id="mpPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
-    <button class="mp-btn mp-close" id="mpClose">×</button>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-/* ===== KATEGORI & STATE ===== */
+/* ===== LOGIKA KEUANGAN ===== */
 const CATEGORIES = {
   income: [
     { value: 'Uang Saku', label: '💰 Uang Saku', hint: 'Harian, mingguan, atau bulanan dari orang tua.' },
@@ -303,6 +286,7 @@ const formatThousands = (str) => { const d = str.replace(/\D/g, ''); return d ? 
 const save = () => localStorage.setItem('violet_finance_tx', JSON.stringify(transactions));
 const saveGoal = () => localStorage.setItem('violet_finance_goal', JSON.stringify(goal));
 const escapeHtml = (str) => str.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const formatTime = (s) => { if(!s || isNaN(s)) return '0:00'; const m = Math.floor(s/60); const sec = Math.floor(s%60); return m + ':' + (sec<10?'0':'') + sec; };
 
 function showToast(msg) {
   const t = $('toast'); t.textContent = msg; t.classList.add('show');
@@ -312,15 +296,12 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
-/* ===== LOGIKA KEUANGAN ===== */
 function setType(type) {
   currentType = type;
   $('btnIncome').className = 'type-btn' + (type === 'income' ? ' active-income' : '');
   $('btnExpense').className = 'type-btn' + (type === 'expense' ? ' active-expense' : '');
-  
   $('category').innerHTML = CATEGORIES[type].map(c => `<option value="${c.value}">${c.label}${c.group ? ' — ' + c.group : ''}</option>`).join('');
   updateCategoryHint();
-
   if (type === 'income') {
     $('saveOption').style.display = 'flex';
     $('saveOption').style.opacity = goal ? '1' : '0.5';
@@ -341,40 +322,29 @@ function addTransaction() {
   const raw = $('amount').value.replace(/\./g, '');
   const amount = parseInt(raw, 10);
   const isSaving = currentType === 'income' && $('chkSave').checked;
-  
   if (!amount || amount <= 0) { showToast('⚠️ Masukkan jumlah valid'); return; }
   if (isSaving && !goal) { showToast('⚠️ Buat target tabungan dulu'); return; }
-
   const now = new Date();
   const txDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
-
   transactions.unshift({
-    id: Date.now(),
-    type: isSaving ? 'saving' : currentType,
-    amount,
+    id: Date.now(), type: isSaving ? 'saving' : currentType, amount,
     category: isSaving ? 'Tabungan' : $('category').value,
-    note: isSaving ? goal.name : $('note').value.trim(),
-    date: txDate.toISOString()
+    note: isSaving ? goal.name : $('note').value.trim(), date: txDate.toISOString()
   });
-
   save(); renderAll();
   $('amount').value = ''; $('note').value = ''; $('chkSave').checked = false;
   showToast(isSaving ? '💎 Masuk tabungan!' : (currentType === 'income' ? '✅ Pemasukan dicatat!' : '✅ Pengeluaran dicatat!'));
 }
-
 function deleteTransaction(id) {
   if (!confirm('Hapus transaksi ini?')) return;
   transactions = transactions.filter(t => t.id !== id);
   save(); renderAll(); showToast('🗑️ Transaksi dihapus');
 }
-
 function clearAll() {
   if (!transactions.length) return showToast('Belum ada transaksi');
   if (!confirm('Hapus semua riwayat?')) return;
   transactions = []; save(); renderAll(); showToast('🗑️ Semua transaksi dihapus');
 }
-
-/* ===== RENDER UI ===== */
 function isSameMonth(iso, ref) { const d = new Date(iso); return d.getFullYear() === ref.getFullYear() && d.getMonth() === ref.getMonth(); }
 function monthTransactions() { return transactions.filter(t => isSameMonth(t.date, viewDate)); }
 
@@ -392,7 +362,6 @@ function renderBalance() {
   $('totalIncome').textContent = fmtRupiah(income);
   $('totalExpense').textContent = fmtRupiah(expense);
   $('uangTabungan').textContent = fmtRupiah(saving);
-  
   const label = viewDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
   const now = new Date();
   const isCur = viewDate.getMonth() === now.getMonth() && viewDate.getFullYear() === now.getFullYear();
@@ -405,12 +374,10 @@ function renderTransactions() {
   const monthly = monthTransactions();
   let filtered = monthly;
   if (currentFilter !== 'all') filtered = monthly.filter(t => t.type === currentFilter);
-
   if (!filtered.length) {
     $('transactionList').innerHTML = '<div class="empty-state">📭<br>Belum ada transaksi</div>';
     return;
   }
-
   $('transactionList').innerHTML = filtered.map(t => {
     let catLbl, ico, cls, pfx, badge = '';
     if (t.type === 'saving') {
@@ -442,7 +409,6 @@ function renderSummary() {
   const grp = {}; exp.forEach(t => grp[t.category] = (grp[t.category] || 0) + t.amount);
   const tot = Object.values(grp).reduce((a,b) => a+b, 0);
   const sorted = Object.entries(grp).sort((a,b) => b[1]-a[1]);
-  
   $('categorySummary').innerHTML = sorted.map(([cat, amt]) => {
     const c = CATEGORIES.expense.find(x => x.value === cat);
     const pct = ((amt/tot)*100).toFixed(0);
@@ -457,7 +423,6 @@ function renderChart() {
   const grp = {}; exp.forEach(t => grp[t.category] = (grp[t.category] || 0) + t.amount);
   const tot = Object.values(grp).reduce((a,b) => a+b, 0);
   const sorted = Object.entries(grp).sort((a,b) => b[1]-a[1]);
-  
   const cx=65, cy=65, r=52, sw=16, circ=2*Math.PI*r;
   let off=0, paths='';
   sorted.forEach(([cat, amt], i) => {
@@ -467,7 +432,6 @@ function renderChart() {
   });
   $('donutSvg').innerHTML = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1c1c20" stroke-width="${sw}"/>${paths}`;
   $('donutTotal').textContent = fmtRupiah(tot);
-  
   $('chartLegend').innerHTML = sorted.map(([cat, amt], i) => {
     const c = CATEGORIES.expense.find(x => x.value === cat);
     return `<div class="legend-item"><span class="legend-dot" style="background:${CHART_COLORS[i%CHART_COLORS.length]}"></span><span class="legend-name">${c ? c.label.replace(/^[^\s]+\s/, '') : cat}</span><span class="legend-pct">${((amt/tot)*100).toFixed(0)}%</span></div>`;
@@ -491,25 +455,21 @@ function renderGoal() {
     });
     return;
   }
-  
   const saved = transactions.filter(t => t.type === 'saving').reduce((a,b) => a+b.amount, 0);
   const pct = Math.min(100, (saved/goal.target)*100);
   const done = saved >= goal.target;
-  
   $('goalContent').innerHTML = `
     <div class="goal-header"><span class="goal-name">${escapeHtml(goal.name)}</span><span class="goal-target">Target ${fmtRupiah(goal.target)}</span></div>
     <div class="progress-track"><div class="progress-fill ${done ? 'done' : ''}" style="width:${pct}%"></div></div>
     <div class="goal-footer"><span>Terkumpul <strong class="amber">${fmtRupiah(saved)}</strong></span><span>${pct.toFixed(0)}%</span></div>
     ${done ? '<div class="goal-done-badge">🎉 Target tercapai!</div>' : `<div class="goal-footer" style="margin-top:6px"><span>Sisa <strong>${fmtRupiah(goal.target-saved)}</strong></span></div>`}
     <div class="goal-actions"><button class="btn btn-ghost" id="btnEditGoal">✏️ Ganti</button><button class="btn btn-ghost" id="btnResetGoal" style="color:var(--red)">🗑️ Hapus</button></div>`;
-    
   $('btnEditGoal').addEventListener('click', () => { goal = null; saveGoal(); setType(currentType); renderGoal(); });
   $('btnResetGoal').addEventListener('click', () => { if(confirm('Hapus target?')) { goal = null; saveGoal(); setType(currentType); renderGoal(); } });
 }
 
-function renderAll() { renderBalance(); renderGoal(); renderChart(); renderTransactions(); renderSummary(); }
+function renderAll() { renderBalance(); renderGoal(); renderChart(); renderTransactions(); renderSummary(); if ($('budgetPanel').style.display !== 'none') renderBudgets(); }
 
-/* ===== EVENT KEUANGAN ===== */
 $('amount').addEventListener('input', e => e.target.value = formatThousands(e.target.value));
 $('btnIncome').addEventListener('click', () => setType('income'));
 $('btnExpense').addEventListener('click', () => setType('expense'));
@@ -526,73 +486,84 @@ document.querySelectorAll('.filter-tab').forEach(tab => {
 $('prevMonth').addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth()-1); viewDate = new Date(viewDate); renderAll(); });
 $('nextMonth').addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth()+1); viewDate = new Date(viewDate); renderAll(); });
 
-/* ===== AUDIO PLAYER (YOUTUBE) ===== */
-let ytPlayer = null, ytReady = false, currentVideoId = null, isPlaying = false;
 
-function loadYouTubeAPI() {
-  if (window.YT && window.YT.Player) { onYouTubeIframeAPIReady(); return; }
-  const tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(tag);
-  window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+/* ===== ANGGARAN BULANAN ===== */
+let budgets = JSON.parse(localStorage.getItem('violet_finance_budgets')) || {};
+
+function saveBudgets() {
+  localStorage.setItem('violet_finance_budgets', JSON.stringify(budgets));
 }
 
-function onYouTubeIframeAPIReady() {
-  ytPlayer = new YT.Player('ytPlayerContainer', {
-    height: '0', width: '0', videoId: '',
-    playerVars: { autoplay: 0, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, rel: 0, iv_load_policy: 3 },
-    events: {
-      onReady: () => ytReady = true,
-      onStateChange: (e) => {
-        if (e.data === 1) { isPlaying = true; updatePlayIcon(); }
-        else if (e.data === 2 || e.data === 0) { isPlaying = false; updatePlayIcon(); }
-      }
-    }
+function getBudgetSpent(category) {
+  return monthTransactions()
+    .filter(t => t.type === 'expense' && t.category === category)
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+}
+
+function renderBudgets() {
+  $('budgetMonthLabel').textContent = viewDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+  const select = $('budgetCategory');
+  const current = select.value;
+  select.innerHTML = CATEGORIES.expense.map(c => `<option value="${c.value}">${c.label}</option>`).join('');
+  if (CATEGORIES.expense.some(c => c.value === current)) select.value = current;
+
+  const entries = Object.entries(budgets)
+    .filter(([category, amount]) => CATEGORIES.expense.some(c => c.value === category) && Number(amount) > 0)
+    .sort((a, b) => getBudgetSpent(b[0]) / Number(b[1]) - getBudgetSpent(a[0]) / Number(a[1]));
+
+  if (!entries.length) {
+    $('budgetList').innerHTML = '<div class="budget-empty">Belum ada anggaran. Atur batas untuk kategori yang ingin lu pantau.</div>';
+    return;
+  }
+
+  $('budgetList').innerHTML = entries.map(([category, limit]) => {
+    const item = CATEGORIES.expense.find(c => c.value === category);
+    const spent = getBudgetSpent(category);
+    const pct = spent / Number(limit) * 100;
+    const width = Math.min(100, pct);
+    const statusClass = pct >= 100 ? 'over' : pct >= 80 ? 'warn' : '';
+    const statusText = pct >= 100 ? 'Melewati batas' : pct >= 80 ? 'Hampir habis' : 'Aman';
+    const remaining = Number(limit) - spent;
+    const remainingText = remaining >= 0 ? 'Sisa ' + fmtRupiah(remaining) : 'Lebih ' + fmtRupiah(Math.abs(remaining));
+    return `<div class="budget-item">
+      <div class="budget-item-head"><span>${item ? item.label : escapeHtml(category)}</span><span class="budget-status ${statusClass}">${statusText}</span></div>
+      <div class="budget-track"><div class="budget-fill ${statusClass}" style="width:${width}%"></div></div>
+      <div class="budget-item-foot"><span>${fmtRupiah(spent)} / ${fmtRupiah(Number(limit))}</span><span>${remainingText} <button class="budget-delete" data-category="${escapeHtml(category)}" title="Hapus anggaran" aria-label="Hapus anggaran ${escapeHtml(category)}">×</button></span></div>
+    </div>`;
+  }).join('');
+
+  document.querySelectorAll('.budget-delete').forEach(button => {
+    button.addEventListener('click', () => {
+      delete budgets[button.dataset.category];
+      saveBudgets();
+      renderBudgets();
+      showToast('Anggaran dihapus');
+    });
   });
 }
 
-$('audioTrigger').addEventListener('click', () => {
-  $('searchPanel').classList.toggle('show');
-  if ($('searchPanel').classList.contains('show')) { $('musicSearch').focus(); if (!ytPlayer) loadYouTubeAPI(); }
+$('budgetTrigger').addEventListener('click', () => {
+  const panel = $('budgetPanel');
+  const open = panel.style.display === 'none';
+  panel.style.display = open ? 'block' : 'none';
+  $('budgetTrigger').setAttribute('aria-expanded', String(open));
+  if (open) renderBudgets();
 });
 
-let searchTimeout;
-$('musicSearch').addEventListener('input', () => {
-  clearTimeout(searchTimeout);
-  const q = $('musicSearch').value.trim();
-  if (!q) { $('searchResults').innerHTML = '<div class="search-empty">Ketik untuk mencari lagu</div>'; return; }
-  $('searchResults').innerHTML = '<div class="search-loading">Mencari...</div>';
-  searchTimeout = setTimeout(async () => {
-    try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
-      const data = await res.json();
-      if (!data.videos || !data.videos.length) { $('searchResults').innerHTML = '<div class="search-empty">Lagu tidak ditemukan</div>'; return; }
-      $('searchResults').innerHTML = data.videos.map(v => `
-        <div class="search-item" data-id="${v.videoId}" data-title="${escapeHtml(v.title)}" data-ch="${escapeHtml(v.channel)}" data-thumb="${v.thumbnail}">
-          <img src="${v.thumbnail}" loading="lazy">
-          <div class="search-item-info"><div class="search-item-title">${escapeHtml(v.title)}</div><div class="search-item-artist">${escapeHtml(v.channel)}</div></div>
-        </div>`).join('');
-      
-      document.querySelectorAll('.search-item').forEach(el => {
-        el.addEventListener('click', () => {
-          if (!ytReady) return showToast('⏳ Player loading, coba lagi...');
-          const id = el.dataset.id;
-          $('mpCover').src = el.dataset.thumb; $('mpTitle').textContent = el.dataset.title; $('mpArtist').textContent = el.dataset.ch;
-          $('miniPlayer').classList.add('show');
-          ytPlayer.loadVideoById(id); ytPlayer.unMute(); ytPlayer.setVolume(80);
-          isPlaying = true; updatePlayIcon(); currentVideoId = id;
-          showToast('🎵 Memutar...');
-        });
-      });
-    } catch(e) { $('searchResults').innerHTML = '<div class="search-empty">Error server</div>'; }
-  }, 600);
+$('budgetAmount').addEventListener('input', e => e.target.value = formatThousands(e.target.value));
+$('btnSaveBudget').addEventListener('click', () => {
+  const category = $('budgetCategory').value;
+  const amount = parseInt($('budgetAmount').value.replace(/\./g, ''), 10);
+  if (!category || !Number.isFinite(amount) || amount <= 0) {
+    showToast('Masukkan batas anggaran yang valid');
+    return;
+  }
+  budgets[category] = amount;
+  saveBudgets();
+  $('budgetAmount').value = '';
+  renderBudgets();
+  showToast('Anggaran berhasil disimpan');
 });
-
-function updatePlayIcon() {
-  $('mpPlayIcon').innerHTML = isPlaying ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>';
-}
-$('mpPlayBtn').addEventListener('click', () => { if (!ytPlayer || !currentVideoId) return; if (ytPlayer.getPlayerState() === 1) ytPlayer.pauseVideo(); else ytPlayer.playVideo(); });
-$('mpClose').addEventListener('click', () => { if (ytPlayer) ytPlayer.stopVideo(); $('miniPlayer').classList.remove('show'); isPlaying = false; currentVideoId = null; updatePlayIcon(); });
 
 /* ===== INIT ===== */
 setType('expense');
